@@ -1,0 +1,35 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+# trainer:
+#   trainer:
+#     resume_from_checkpoint: # '${save_dir}/models/${experiment_name}/fold_${trainer.idx_fold}_best.ckpt'
+#     max_epochs: 20
+#     check_val_every_n_epoch: 1
+#     accumulate_grad_batches: 1
+#     gradient_clip_val: 10
+#     amp_backend: "native"
+#     amp_level: "O1"
+#     precision: 16
+#     gpus: -1
+#     accelerator: "ddp"
+#     # sync_batchnorm: True
+#     benchmark: True
+#     deterministic: True
+#     num_sanity_val_steps: 0
+#     # stochastic_weight_avg: True

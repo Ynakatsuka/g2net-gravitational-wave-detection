@@ -1,0 +1,26 @@
+hooks:
+  post_forward:
+    name: SigmoidPostForwardHook
+  visualizations:
+    - name: G2NetGradCamVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}
+        input_shape: [3, 4096]
+        target_layer: "backbone.conv_head"
+        select_top_predictions: True
+    - name: G2NetGradCamVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}
+        input_shape: [3, 4096]
+        target_layer: "backbone.conv_head"
+        select_top_predictions: False
+    - name: ScatterPlotVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}
+    - name: LiftChartVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}

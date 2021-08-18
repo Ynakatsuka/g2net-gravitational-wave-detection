@@ -1,0 +1,81 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+model:
+  model:
+    name: "G2Net"
+    params:
+      num_classes: 1
+      backbone:
+        name: "tf_efficientnet_b7_ns"
+        params:
+          in_chans: 3
+          pretrained: True
+      spectrogram_method: "CQT" # STFT, CQT
+      hop_length: 8
+      bins_per_octave: 8
+      sample_rate: ${dataset.dataset.0.params.sample_rate}
+      fmin: 10
+      fmax: 1024
+      window: "hann"
+      use_spec_augmentation: False
+      time_drop_width: 64
+      time_stripes_num: 2
+      freq_drop_width: 8
+      freq_stripes_num: 2
+      spec_augmentation_method: "cm"
+      apply_tta: False
+      apply_mixup: False
+      apply_spec_shuffle: False
+      spec_shuffle_prob: 0
+    last_linear:
+      replace: True
+      params:
+        # dropout_rate: 0.
+        pool_type: "gem"
+        # use_seblock: False
+        # use_multisample_dropout: True
+        # multi_sample_dropout_p: 0.2
+        # n_multi_samples: 5
+
+trainer:
+  train:
+    batch_size: 64
+
+  evaluation:
+    batch_size: 64
+    save_predictions: True
+    dirpath: "${save_dir}/predictions/oof/${experiment_name}"
+    filename: "fold_${trainer.idx_fold}.npy"
+
+  trainer:
+    resume_from_checkpoint: # '${save_dir}/models/${experiment_name}/fold_${trainer.idx_fold}_best.ckpt'
+    max_epochs: 5
+    check_val_every_n_epoch: 1
+    accumulate_grad_batches: 1
+    gradient_clip_val: 10
+    amp_backend: "native"
+    amp_level: "O1"
+    precision: 16
+    gpus: -1
+    accelerator: "ddp"
+    # sync_batchnorm: True
+    benchmark: True
+    deterministic: True
+    num_sanity_val_steps: 0
+    stochastic_weight_avg: True

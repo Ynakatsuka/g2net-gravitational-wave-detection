@@ -1,0 +1,52 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+dataset:
+  dataset:
+    - name: "G2NetDataset"
+      params:
+        csv_filename: ${fold.csv_filename}
+        input_column: "id"
+        target_column: ${competition.target_column}
+        target_unique_values: ${competition.target_unique_values}
+        input_dir: ${input_dir}
+        extension: ".npy"
+        num_fold: 5
+        idx_fold: ${trainer.idx_fold}
+        sample_rate: 2048
+        bandpass_filters: 8
+        bandpass_lower_freq: 20
+        bandpass_higher_freq: 500
+        predictions_dirname_for_pseudo_labeling: "${save_dir}/predictions/test/trainer=exp001"
+        test_csv_filename: "sample_submission.csv"
+        test_images_dir: "test"
+      splits:
+        - split: "train"
+        - split: "validation"
+    - name: "G2NetDataset"
+      params:
+        csv_filename: "sample_submission.csv"
+        input_column: "id"
+        input_dir: ${input_dir}
+        extension: ".npy"
+        sample_rate: 2048
+        bandpass_filters: 8
+        bandpass_lower_freq: 20
+        bandpass_higher_freq: 500
+      splits:
+        - split: "test"

@@ -1,0 +1,5 @@
+train_path: "${input_dir}/training_labels.csv"
+test_path: "${input_dir}/sample_submission.csv"
+target_column: "target"
+target_unique_values:
+sample_submission_path: "${input_dir}/sample_submission.csv"

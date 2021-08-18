@@ -1,0 +1,36 @@
+dataset:
+  - name: "G2NetDataset"
+    params:
+      csv_filename: ${fold.csv_filename}
+      input_column: "id"
+      target_column: ${competition.target_column}
+      target_unique_values: ${competition.target_unique_values}
+      input_dir: ${input_dir}
+      extension: ".npy"
+      num_fold: 5
+      idx_fold: ${trainer.idx_fold}
+      sample_rate: 2048
+      bandpass_filters: 8
+      bandpass_lower_freq: 20
+      bandpass_higher_freq: 500
+      normalize_mode: 5
+    splits:
+      - split: "train"
+      - split: "validation"
+  - name: "G2NetDataset"
+    params:
+      csv_filename: "sample_submission.csv"
+      input_column: "id"
+      input_dir: ${input_dir}
+      extension: ".npy"
+      sample_rate: 2048
+      bandpass_filters: ${dataset.dataset.0.params.bandpass_filters}
+      bandpass_lower_freq: ${dataset.dataset.0.params.bandpass_lower_freq}
+      bandpass_higher_freq: ${dataset.dataset.0.params.bandpass_higher_freq}
+      normalize_mode: ${dataset.dataset.0.params.normalize_mode}
+    splits:
+      - split: "test"
+
+transform:
+  name: "base_audio_transform"
+  num_preprocessor: 24

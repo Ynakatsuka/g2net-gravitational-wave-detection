@@ -1,0 +1,11 @@
+optimizer:
+  name: "RAdam"
+  params:
+    lr: 5e-03
+    weight_decay: 1e-6
+
+scheduler:
+  name: "ReduceLROnPlateau"
+  params:
+    mode: "max"
+    patience: 2

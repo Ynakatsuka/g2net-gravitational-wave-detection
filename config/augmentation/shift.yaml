@@ -1,0 +1,39 @@
+# image size
+height:
+width:
+
+# augmentation inside dataset
+transform:
+  train:
+    - name: Shift
+      params:
+        p: 0.5
+  validation:
+
+  test:
+
+# augmenatation like mixup
+strong_transform:
+#   name: mixup
+#   params:
+#     p: 0.5
+#     alpha: 0.8
+
+# augmentation on torch.Tensor
+batch_transform:
+  train:
+
+  validation:
+
+  test:
+
+#   - name: RandomHorizontalFlip
+#     params:
+#       p: 0.5
+
+# TTA
+tta_transform:
+#   _target_: ttach.ClassificationTTAWrapper
+#   transforms:
+#     _target_: ttach.aliases.d4_transform
+#   merge_mode: 'mean'
