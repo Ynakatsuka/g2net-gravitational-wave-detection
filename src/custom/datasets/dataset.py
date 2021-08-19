@@ -34,6 +34,7 @@ class G2NetDataset(BaseDataset):
         idx_fold=0,
         label_smoothing=0,
         return_input_as_x=True,
+        csv_input_dir=None,
         # for pseudo labeling
         predictions_dirname_for_pseudo_labeling=None,
         test_csv_filename=None,
@@ -65,6 +66,7 @@ class G2NetDataset(BaseDataset):
             idx_fold,
             label_smoothing,
             return_input_as_x,
+            csv_input_dir,
             predictions_dirname_for_pseudo_labeling,
             test_csv_filename,
             test_images_dir,

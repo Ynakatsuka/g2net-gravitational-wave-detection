@@ -5,12 +5,11 @@ import sys
 sys.path.append("src/")
 
 import hydra
+import kvt
 import numpy as np
 import pandas as pd
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
-
-import kvt
 
 
 @hydra.main(config_path="../../config", config_name="default")
@@ -32,7 +31,7 @@ def main(config: DictConfig) -> None:
     kfold = instantiate(config.fold.fold)
     for f, (_, valid_index) in enumerate(kfold.split(train, y=y, groups=groups)):
         train.loc[valid_index, fold_column] = f
-    path = os.path.join(config.input_dir, config.fold.csv_filename)
+    path = os.path.join(config.save_dir, config.fold.csv_filename)
     train.to_csv(path, index=False)
 
 

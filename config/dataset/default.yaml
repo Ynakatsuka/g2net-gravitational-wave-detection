@@ -14,6 +14,7 @@ dataset:
       bandpass_lower_freq: 20
       bandpass_higher_freq: 500
       normalize_mode: 5
+      csv_input_dir: ${save_dir}
     splits:
       - split: "train"
       - split: "validation"

@@ -26,6 +26,7 @@ class BaseDataset(torch.utils.data.Dataset):
         idx_fold=0,
         label_smoothing=0,
         return_input_as_x=True,
+        csv_input_dir=None,
         # for pseudo labeling
         predictions_dirname_for_pseudo_labeling=None,
         test_csv_filename=None,
@@ -46,15 +47,22 @@ class BaseDataset(torch.utils.data.Dataset):
         self.return_input_as_x = return_input_as_x
 
         # load
-        df = pd.read_csv(os.path.join(input_dir, csv_filename))
+        if csv_input_dir is not None:
+            df = pd.read_csv(os.path.join(csv_input_dir, csv_filename))
+        else:
+            df = pd.read_csv(os.path.join(input_dir, csv_filename))
 
         if predictions_dirname_for_pseudo_labeling is not None:
             # load
             df_pl = pd.read_csv(os.path.join(input_dir, test_csv_filename))
-            load_test_paths = sorted(glob.glob(f"{predictions_dirname_for_pseudo_labeling}/*.npy"))
+            load_test_paths = sorted(
+                glob.glob(f"{predictions_dirname_for_pseudo_labeling}/*.npy")
+            )
             print(f"[predictions for pseudo labeling] {load_test_paths}")
             assert len(load_test_paths) == num_fold
-            df_pl[target_column] = np.mean([np.load(path) for path in load_test_paths], axis=0)
+            df_pl[target_column] = np.mean(
+                [np.load(path) for path in load_test_paths], axis=0
+            )
 
             # concat
             df["__is_test__"], df_pl["__is_test__"] = False, True
@@ -102,7 +110,9 @@ class BaseDataset(torch.utils.data.Dataset):
         if self.test_images_dir is not None:
             is_test = df["__is_test__"]
             test_inputs = df[self.input_column].apply(
-                lambda x: os.path.join(self.input_dir, self.test_images_dir, x + self.extension)
+                lambda x: os.path.join(
+                    self.input_dir, self.test_images_dir, x + self.extension
+                )
             )
             inputs[is_test] = test_inputs[is_test]
 
@@ -168,6 +178,7 @@ class BaseTextDataset(BaseDataset):
         idx_fold=0,
         label_smoothing=0,
         return_input_as_x=True,
+        csv_input_dir=None,
         # for pseudo labeling
         predictions_dirname_for_pseudo_labeling=None,
         test_csv_filename=None,
@@ -200,6 +211,7 @@ class BaseTextDataset(BaseDataset):
             idx_fold=idx_fold,
             label_smoothing=label_smoothing,
             return_input_as_x=return_input_as_x,
+            csv_input_dir=csv_input_dir,
             # for pseudo labeling
             predictions_dirname_for_pseudo_labeling=predictions_dirname_for_pseudo_labeling,
             test_csv_filename=test_csv_filename,

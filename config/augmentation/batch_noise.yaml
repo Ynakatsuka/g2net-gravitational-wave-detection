@@ -24,6 +24,8 @@ batch_transform:
       params:
         mode: "per_channel"
         sample_rate: 2048
+        min_snr_in_db: 1
+        max_snr_in_db: 8
         p: 0.5
   validation:
 
