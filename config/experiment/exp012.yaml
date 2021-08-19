@@ -1,0 +1,35 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: tpu
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+optimizer:
+  optimizer:
+    name: "RAdam"
+    params:
+      lr: 1e-02
+      weight_decay: 1e-6
+
+model:
+  model:
+    params:
+      resize_shape: 256
+      hop_length: 8
+      backbone:
+        name: "tf_efficientnet_b0_ns"
+        params:
+          in_chans: 3
+          pretrained: True

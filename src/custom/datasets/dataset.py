@@ -1,10 +1,11 @@
 import os
 
-import kvt
 import numpy as np
 import torch
-from kvt.datasets import BaseDataset
 from scipy import signal, stats
+
+import kvt
+from kvt.datasets import BaseDataset
 
 
 def whiten(signal):
@@ -79,9 +80,7 @@ class G2NetDataset(BaseDataset):
         self.apply_whiten = apply_whiten
 
         Wn = (bandpass_lower_freq, bandpass_higher_freq)
-        self.b, self.a = signal.butter(
-            bandpass_filters, Wn, btype="bandpass", fs=sample_rate
-        )
+        self.b, self.a = signal.butter(bandpass_filters, Wn, btype="bandpass", fs=sample_rate)
 
     def _load(self, path):
         x = np.load(path)
@@ -90,7 +89,12 @@ class G2NetDataset(BaseDataset):
     def _extract_path_to_input_from_input_column(self, df):
         inputs = df[self.input_column].apply(
             lambda x: os.path.join(
-                self.input_dir, self.images_dir, x[0], x[1], x[2], x + self.extension,
+                self.input_dir,
+                self.images_dir,
+                x[0],
+                x[1],
+                x[2],
+                x + self.extension,
             )
         )
         if self.test_images_dir is not None:
@@ -153,9 +157,7 @@ class G2NetDataset(BaseDataset):
         elif self.normalize_mode == 11:
             x -= x.min() + 1e-07
             x /= x.max()
-            x = np.concatenate(
-                [np.expand_dims(stats.boxcox(x[i])[0], axis=0) for i in range(3)]
-            )
+            x = np.concatenate([np.expand_dims(stats.boxcox(x[i])[0], axis=0) for i in range(3)])
             return x
         else:
             return (x - 4.3110074e-26) / 6.1481726e-21
@@ -177,10 +179,7 @@ class G2NetDataset(BaseDataset):
 
         if self.transform is not None:
             x = np.concatenate(
-                [
-                    np.expand_dims(self.transform(x[i], self.sample_rate), axis=0)
-                    for i in range(3)
-                ]
+                [np.expand_dims(self.transform(x[i], self.sample_rate), axis=0) for i in range(3)]
             )
 
         if self.apply_bandpass:
