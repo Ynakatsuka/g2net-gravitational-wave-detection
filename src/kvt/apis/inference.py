@@ -1,17 +1,14 @@
 import os
 
-import kvt.utils
 import pytorch_lightning as pl
 import torch
-from kvt.builder import (
-    build_batch_transform,
-    build_dataloaders,
-    build_hooks,
-    build_lightning_module,
-    build_model,
-    build_tta_wrapper,
-)
-from kvt.utils import check_attr, concatenate, replace_last_linear, save_predictions
+
+import kvt.utils
+from kvt.builder import (build_batch_transform, build_dataloaders, build_hooks,
+                         build_lightning_module, build_model,
+                         build_tta_wrapper)
+from kvt.utils import (check_attr, concatenate, replace_last_linear,
+                       save_predictions)
 
 
 def run(config):

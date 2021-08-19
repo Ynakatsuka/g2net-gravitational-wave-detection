@@ -19,9 +19,7 @@ class HistogramNormalize(ImageOnlyTransform):
 
     def apply(self, image, **params):
         # get image histogram
-        image_histogram, bins = np.histogram(
-            image.flatten(), self.number_bins, density=True
-        )
+        image_histogram, bins = np.histogram(image.flatten(), self.number_bins, density=True)
         cdf = image_histogram.cumsum()  # cumulative distribution function
         cdf = 255 * cdf / cdf[-1]  # normalize
 

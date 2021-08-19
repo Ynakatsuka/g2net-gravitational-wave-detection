@@ -24,21 +24,9 @@ import kvt.models.sound_event_detections
 import kvt.optimizers
 import kvt.samplers
 import kvt.transforms
-from kvt.registry import (
-    BACKBONES,
-    CALLBACKS,
-    COLLATE_FNS,
-    DATASETS,
-    HOOKS,
-    LIGHTNING_MODULES,
-    LOSSES,
-    METRICS,
-    MODELS,
-    OPTIMIZERS,
-    SAMPLERS,
-    SCHEDULERS,
-    TRANSFORMS,
-)
+from kvt.registry import (BACKBONES, CALLBACKS, COLLATE_FNS, DATASETS, HOOKS,
+                          LIGHTNING_MODULES, LOSSES, METRICS, MODELS,
+                          OPTIMIZERS, SAMPLERS, SCHEDULERS, TRANSFORMS)
 
 try:
     import torch_optimizer

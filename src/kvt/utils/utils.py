@@ -75,9 +75,12 @@ def concatenate(results):
         raise ValueError(f"Invalid result type: {type(results[0])}")
 
 
-def save_predictions(predictions, dirpath, filename, split='validation'):
+def save_predictions(predictions, dirpath, filename, split="validation"):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
-    path = os.path.join(dirpath, f"{split}_{filename}",)
+    path = os.path.join(
+        dirpath,
+        f"{split}_{filename}",
+    )
     np.save(path, predictions)

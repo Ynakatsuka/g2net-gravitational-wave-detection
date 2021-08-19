@@ -1,14 +1,15 @@
-import kvt
-import kvt.hooks
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from kvt.hooks import VisualizationHookBase
 from PIL import Image
 from torchcam import cams
 from torchcam.cams import locate_candidate_layer
 from torchcam.utils import overlay_mask
 from torchvision.transforms.functional import to_pil_image
+
+import kvt
+import kvt.hooks
+from kvt.hooks import VisualizationHookBase
 
 
 def make_subset_dataloader(dataloader, indices, batch_size):

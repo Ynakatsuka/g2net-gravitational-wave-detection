@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
 from efficientnet_pytorch import EfficientNet
 from efficientnet_pytorch.utils import get_model_params, round_filters, url_map
+
 from kvt.registry import BACKBONES
 from kvt.utils import build_from_config
 
@@ -154,9 +155,7 @@ def build_encoder(backbone):
         encoder = DenseNetEncoder(backbone)
     elif backbone_name.startswith("eff"):
         encoder = EfficientNetEncoder(**efficient_net_encoders[backbone_name]["params"])
-        settings = efficient_net_encoders[backbone_name]["pretrained_settings"][
-            "imagenet"
-        ]
+        settings = efficient_net_encoders[backbone_name]["pretrained_settings"]["imagenet"]
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
         encoder.channels = efficient_net_encoders[backbone_name]["out_shapes"]
 

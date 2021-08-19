@@ -25,9 +25,7 @@ class NeedleAugmentation(ImageOnlyTransform):
 
         for _ in range(1, self.n_needles):
             needle = cv2.cvtColor(
-                cv2.imread(
-                    os.path.join(self.needle_folder, random.choice(needle_images))
-                ),
+                cv2.imread(os.path.join(self.needle_folder, random.choice(needle_images))),
                 cv2.COLOR_BGR2RGB,
             )
             needle = cv2.flip(needle, random.choice([-1, 0, 1]))

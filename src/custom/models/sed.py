@@ -1,23 +1,20 @@
 from functools import partial
 
-import kvt
-import kvt.models
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from kvt.augmentation import SpecAugmentationPlusPlus
-from kvt.models.layers import AttBlockV2
-from kvt.models.sound_event_detections import (
-    Loudness,
-    PCENTransform,
-    add_frequency_encoding,
-    add_time_encoding,
-    make_delta,
-)
 from nnAudio.Spectrogram import CQT1992v2, CQT2010v2
 from torchlibrosa.augmentation import SpecAugmentation
 from torchvision import transforms
+
+import kvt
+import kvt.models
+from kvt.augmentation import SpecAugmentationPlusPlus
+from kvt.models.layers import AttBlockV2
+from kvt.models.sound_event_detections import (Loudness, PCENTransform,
+                                               add_frequency_encoding,
+                                               add_time_encoding, make_delta)
 
 from .wavelet import CWT
 
@@ -138,9 +135,7 @@ class G2Net(nn.Module):
         # self.backbone = nn.Sequential(*layers)
         self.backbone = backbone
 
-    def forward(
-        self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False
-    ):
+    def forward(self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False):
         # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
         x = []
         for i in range(input.shape[1]):
@@ -275,9 +270,7 @@ class AttentionG2Net(G2Net):
         if self.use_gru_layer:
             self.gru = nn.GRU(in_features, in_features, batch_first=True)
 
-    def forward(
-        self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False
-    ):
+    def forward(self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False):
         # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
         x = []
         for i in range(input.shape[1]):

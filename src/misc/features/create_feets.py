@@ -5,9 +5,8 @@ import warnings
 import feets
 import hydra
 import pandas as pd
-from omegaconf import DictConfig
-
 from base import BaseG2NetFeatureEngineeringDataset, G2NetFeatureEngineering
+from omegaconf import DictConfig
 
 
 class FeatsFeatures(BaseG2NetFeatureEngineeringDataset):
@@ -33,12 +32,8 @@ def main(config: DictConfig) -> None:
     train = pd.read_csv(config.competition.train_path)
     test = pd.read_csv(config.competition.test_path)
 
-    train["path"] = train["id"].apply(
-        lambda x: f"{input_dir}/train/{x[0]}/{x[1]}/{x[2]}/{x}.npy"
-    )
-    test["path"] = test["id"].apply(
-        lambda x: f"{input_dir}/test/{x[0]}/{x[1]}/{x[2]}/{x}.npy"
-    )
+    train["path"] = train["id"].apply(lambda x: f"{input_dir}/train/{x[0]}/{x[1]}/{x[2]}/{x}.npy")
+    test["path"] = test["id"].apply(lambda x: f"{input_dir}/test/{x[0]}/{x[1]}/{x[2]}/{x}.npy")
 
     num_workers = multiprocessing.cpu_count()
     transformer = G2NetFeatureEngineering(

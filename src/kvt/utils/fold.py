@@ -42,10 +42,7 @@ class MultilabelStratifiedGroupKFold(_BaseKFold):
         # count labels by group id.
         col, row = np.array(sorted(enumerate(aid_arr), key=lambda x: x[1])).T
         cnts_by_group = (
-            coo_matrix((np.ones(len(y)), (row, col)))
-            .dot(coo_matrix(y))
-            .toarray()
-            .astype(int)
+            coo_matrix((np.ones(len(y)), (row, col))).dot(coo_matrix(y)).toarray().astype(int)
         )
         cnts_by_fold = np.zeros((self.n_splits, n_class), int)
 
@@ -194,16 +191,13 @@ class StratifiedGroupKFold(_BaseKFold):
             warnings.warn(
                 (
                     "The least populated class in y has only %d"
-                    " members, which is less than n_splits=%d."
-                    % (n_smallest_class, self.n_splits)
+                    " members, which is less than n_splits=%d." % (n_smallest_class, self.n_splits)
                 ),
                 UserWarning,
             )
         n_classes = len(y_cnt)
 
-        _, groups_inv, groups_cnt = np.unique(
-            groups, return_inverse=True, return_counts=True
-        )
+        _, groups_inv, groups_cnt = np.unique(groups, return_inverse=True, return_counts=True)
         y_counts_per_group = np.zeros((len(groups_cnt), n_classes))
         for class_idx, group_idx in zip(y_inv, groups_inv):
             y_counts_per_group[group_idx, class_idx] += 1
@@ -216,9 +210,7 @@ class StratifiedGroupKFold(_BaseKFold):
 
         # Stable sort to keep shuffled order for groups with the same
         # class distribution variance
-        sorted_groups_idx = np.argsort(
-            -np.std(y_counts_per_group, axis=1), kind="mergesort"
-        )
+        sorted_groups_idx = np.argsort(-np.std(y_counts_per_group, axis=1), kind="mergesort")
 
         for group_idx in sorted_groups_idx:
             group_y_counts = y_counts_per_group[group_idx]
@@ -232,9 +224,7 @@ class StratifiedGroupKFold(_BaseKFold):
 
         for i in range(self.n_splits):
             test_indices = [
-                idx
-                for idx, group_idx in enumerate(groups_inv)
-                if group_idx in groups_per_fold[i]
+                idx for idx, group_idx in enumerate(groups_inv) if group_idx in groups_per_fold[i]
             ]
             yield test_indices
 

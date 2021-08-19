@@ -1,2 +1,2 @@
-from .unet import UNet, UNetWithClassificationHead
 from .fpn import FPN
+from .unet import UNet, UNetWithClassificationHead

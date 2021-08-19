@@ -5,11 +5,12 @@ import sys
 sys.path.append("src/")
 
 import hydra
-import kvt
 import numpy as np
 import pandas as pd
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
+
+import kvt
 
 
 @hydra.main(config_path="../../config", config_name="default")

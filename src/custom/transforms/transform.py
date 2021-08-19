@@ -1,8 +1,9 @@
 import albumentations as albu
 import cv2
+import numpy as np
+
 import kvt
 import kvt.augmentation
-import numpy as np
 
 
 def sample_transform(split, **params):

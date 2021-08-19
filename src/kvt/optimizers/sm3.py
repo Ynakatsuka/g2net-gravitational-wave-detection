@@ -24,6 +24,7 @@ class SM3(Optimizer):
     .. _Memory-Efficient Adaptive Optimization:
         https://arxiv.org/abs/1901.11150
     """
+
     def __init__(self, params, lr=0.1, momentum=0.0, beta=0.0, eps=1e-30):
         if not 0.0 <= lr:
             raise ValueError("Invalid learning rate: {0}".format(lr))
@@ -34,7 +35,7 @@ class SM3(Optimizer):
         if not 0.0 <= eps:
             raise ValueError("Invalid eps: {0}".format(eps))
 
-        defaults = {'lr': lr, 'momentum': momentum, 'beta': beta, 'eps': eps}
+        defaults = {"lr": lr, "momentum": momentum, "beta": beta, "eps": eps}
         super(SM3, self).__init__(params, defaults)
 
     @torch.no_grad()
@@ -51,10 +52,10 @@ class SM3(Optimizer):
                 loss = closure()
 
         for group in self.param_groups:
-            momentum = group['momentum']
-            beta = group['beta']
-            eps = group['eps']
-            for p in group['params']:
+            momentum = group["momentum"]
+            beta = group["beta"]
+            eps = group["eps"]
+            for p in group["params"]:
                 if p is None:
                     continue
                 grad = p.grad
@@ -65,8 +66,8 @@ class SM3(Optimizer):
 
                 # State initialization
                 if len(state) == 0:
-                    state['step'] = 0
-                    state['momentum_buffer'] = 0.
+                    state["step"] = 0
+                    state["momentum_buffer"] = 0.0
                     _add_initial_accumulators(state, grad)
 
                 if grad.is_sparse:
@@ -107,19 +108,19 @@ class SM3(Optimizer):
                     # Add small amount for numerical stability
                     update.add_(eps).rsqrt_().mul_(grad)
 
-                    if momentum > 0.:
-                        m = state['momentum_buffer']
-                        update.mul_(1. - momentum).add_(m, alpha=momentum)
-                        state['momentum_buffer'] = update.detach()
+                    if momentum > 0.0:
+                        m = state["momentum_buffer"]
+                        update.mul_(1.0 - momentum).add_(m, alpha=momentum)
+                        state["momentum_buffer"] = update.detach()
 
-                p.sub_(update, alpha=group['lr'])
-                state['step'] += 1
+                p.sub_(update, alpha=group["lr"])
+                state["step"] += 1
         return loss
 
     def _update_accumulator(self, beta, acc_list, update):
         for i, acc in enumerate(acc_list):
             nu_max = _max_reduce_except_dim(update, i)
-            if beta > 0.:
+            if beta > 0.0:
                 torch.max(acc, nu_max, out=acc)
             else:
                 # No need to compare - nu_max is bigger because of grad ** 2
@@ -127,19 +128,21 @@ class SM3(Optimizer):
 
     def _update_sparse_accumulator(self, beta, acc, update):
         nu_max = _max_reduce_except_dim(update.to_dense(), 0).squeeze()
-        if beta > 0.:
+        if beta > 0.0:
             torch.max(acc, nu_max, out=acc)
         else:
             # No need to compare - nu_max is bigger because of grad ** 2
             acc.copy_(nu_max)
 
+
 def _compute_sparse_update(beta, acc, grad_values, grad_indices):
     # In the sparse case, a single accumulator is used.
     update_values = torch.gather(acc, 0, grad_indices[0])
-    if beta > 0.:
+    if beta > 0.0:
         update_values.mul_(beta)
-    update_values.addcmul_(grad_values, grad_values, value=1. - beta)
+    update_values.addcmul_(grad_values, grad_values, value=1.0 - beta)
     return update_values
+
 
 def _compute_update(beta, acc_list, grad):
     rank = len(acc_list)
@@ -147,15 +150,17 @@ def _compute_update(beta, acc_list, grad):
     for i in range(1, rank):
         # We rely on broadcasting to get the proper end shape.
         update = torch.min(update, acc_list[i])
-    if beta > 0.:
+    if beta > 0.0:
         update.mul_(beta)
-    update.addcmul_(grad, grad, value=1. - beta)
+    update.addcmul_(grad, grad, value=1.0 - beta)
 
     return update
 
+
 def _key(i):
     # Returns key used for accessing accumulators
-    return 'accumulator_' + str(i)
+    return "accumulator_" + str(i)
+
 
 def _add_initial_accumulators(state, grad):
     # Creates initial accumulators. For a dense tensor of shape (n1, n2, n3),
@@ -164,7 +169,7 @@ def _add_initial_accumulators(state, grad):
     # accumulator of shape (n,).
     shape = grad.shape
     rank = len(shape)
-    defaults = {'device': grad.device, 'dtype': grad.dtype}
+    defaults = {"device": grad.device, "dtype": grad.dtype}
     acc = {}
 
     if grad.is_sparse:
@@ -178,6 +183,7 @@ def _add_initial_accumulators(state, grad):
             acc[_key(i)] = torch.zeros(acc_shape, **defaults)
 
     state.update(acc)
+
 
 def _max_reduce_except_dim(tensor, dim):
     # Computes max along all dimensions except the given dim.

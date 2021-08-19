@@ -1,6 +1,6 @@
-'''
+"""
 https://github.com/lyakaap/NetVLAD-pytorch/blob/master/netvlad.py
-'''
+"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,8 +9,7 @@ import torch.nn.functional as F
 class NetVLAD(nn.Module):
     """NetVLAD layer implementation"""
 
-    def __init__(self, num_clusters=64, dim=128, alpha=100.0,
-                 normalize_input=True):
+    def __init__(self, num_clusters=64, dim=128, alpha=100.0, normalize_input=True):
         """
         Args:
             num_clusters : int
@@ -35,9 +34,7 @@ class NetVLAD(nn.Module):
         self.conv.weight = nn.Parameter(
             (2.0 * self.alpha * self.centroids).unsqueeze(-1).unsqueeze(-1)
         )
-        self.conv.bias = nn.Parameter(
-            - self.alpha * self.centroids.norm(dim=1)
-        )
+        self.conv.bias = nn.Parameter(-self.alpha * self.centroids.norm(dim=1))
 
     def forward(self, x):
         N, C = x.shape[:2]
@@ -50,10 +47,11 @@ class NetVLAD(nn.Module):
         soft_assign = F.softmax(soft_assign, dim=1)
 
         x_flatten = x.view(N, C, -1)
-        
+
         # calculate residuals to each clusters
-        residual = x_flatten.expand(self.num_clusters, -1, -1, -1).permute(1, 0, 2, 3) - \
-            self.centroids.expand(x_flatten.size(-1), -1, -1).permute(1, 2, 0).unsqueeze(0)
+        residual = x_flatten.expand(self.num_clusters, -1, -1, -1).permute(
+            1, 0, 2, 3
+        ) - self.centroids.expand(x_flatten.size(-1), -1, -1).permute(1, 2, 0).unsqueeze(0)
         residual *= soft_assign.unsqueeze(2)
         vlad = residual.sum(dim=-1)
 

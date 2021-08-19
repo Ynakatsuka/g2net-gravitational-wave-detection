@@ -17,8 +17,7 @@ class Mixout(InplaceFunction):
     def forward(cls, ctx, input, target=None, p=0.0, training=False, inplace=False):
         if p < 0 or p > 1:
             raise ValueError(
-                "A mix probability of mixout has to be between 0 and 1,"
-                " but got {}".format(p)
+                "A mix probability of mixout has to be between 0 and 1," " but got {}".format(p)
             )
         if target is not None and input.size() != target.size():
             raise ValueError(
@@ -53,9 +52,7 @@ class Mixout(InplaceFunction):
         if ctx.p == 1:
             output = target
         else:
-            output = (
-                (1 - ctx.noise) * target + ctx.noise * output - ctx.p * target
-            ) / (1 - ctx.p)
+            output = ((1 - ctx.noise) * target + ctx.noise * output - ctx.p * target) / (1 - ctx.p)
         return output
 
     @staticmethod
@@ -94,9 +91,7 @@ class MixLinear(nn.Module):
             init.uniform_(self.bias, -bound, bound)
 
     def forward(self, input):
-        return F.linear(
-            input, mixout(self.weight, self.target, self.p, self.training), self.bias
-        )
+        return F.linear(input, mixout(self.weight, self.target, self.p, self.training), self.bias)
 
     def extra_repr(self):
         type = "drop" if self.target is None else "mix"

@@ -1,9 +1,10 @@
-import kvt
-import kvt.losses
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+import kvt
+import kvt.losses
 
 
 @kvt.LOSSES.register

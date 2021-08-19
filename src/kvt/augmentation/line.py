@@ -35,9 +35,7 @@ class Line(ImageOnlyTransform):
 
         for i in range(num_lines):
             p = np.array([1 / 4, 1 / 4, 1 / 4, 1 / 4, 1, 1])
-            func = np.random.choice(
-                [line0, line1, line2, line3, line4, line5], p=p / p.sum()
-            )
+            func = np.random.choice([line0, line1, line2, line3, line4, line5], p=p / p.sum())
             (x0, y0), (x1, y1) = func()
 
             colorr = np.random.randint(0, 50)

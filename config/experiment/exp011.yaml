@@ -1,0 +1,42 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: sam
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+trainer:
+  trainer:
+    max_epochs: 3
+    gradient_clip_val: 0.0
+    amp_backend: "native"
+    amp_level: "O2"
+    precision: 32
+
+model:
+  model:
+    params:
+      pretrained: "${save_dir}/models/default/fold_${trainer.idx_fold}_best.ckpt"
+
+optimizer:
+  optimizer:
+    name: "SAM"
+    params:
+      base:
+        name: "SGD"
+        params:
+          lr: 1e-03
+      weight_decay: 1e-6
+      rho: 0.1
+      adaptive: True

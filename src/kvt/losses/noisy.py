@@ -26,13 +26,7 @@ class LabelSmoothingCrossEntropy(nn.Module):
         return epsilon * x + (1 - epsilon) * y
 
     def reduce_loss(self, loss, reduction="mean"):
-        return (
-            loss.mean()
-            if reduction == "mean"
-            else loss.sum()
-            if reduction == "sum"
-            else loss
-        )
+        return loss.mean() if reduction == "mean" else loss.sum() if reduction == "sum" else loss
 
     def forward(self, preds, target, reduction="mean"):
         n = preds.size()[-1]
@@ -58,10 +52,7 @@ def soft_cross_entropy_loss(logits, targets, weights=1, reduction="mean"):
 
 def coral_loss(logits, targets, weights=1, reduction="mean"):
     loss = -torch.sum(
-        (
-            F.logsigmoid(logits) * targets
-            + (F.logsigmoid(logits) - logits) * (1 - targets)
-        )
+        (F.logsigmoid(logits) * targets + (F.logsigmoid(logits) - logits) * (1 - targets))
         * weights,
         dim=1,
     )
@@ -238,7 +229,9 @@ class JointOptimizationLoss(nn.Module):
             print("criterion: update_target is False. pseudo_target is True.")
 
     def __repr__(self):
-        return f"JointOptimizationLoss(alpha={self.alpha}, beta={self.beta}, trigger={self.trigger})"
+        return (
+            f"JointOptimizationLoss(alpha={self.alpha}, beta={self.beta}, trigger={self.trigger})"
+        )
 
 
 class SymmetricCrossEntropy(nn.Module):
@@ -342,19 +335,13 @@ class IterativeSelfLearningLoss(nn.Module):
         logits, targets = _check_input_type(logits, targets, self.loss_name)
         if logits.requires_grad:
             noisy_targets = targets
-            corrected_targets = self.model.train_pseudo_labels[indices].to(
-                targets.device
-            )
+            corrected_targets = self.model.train_pseudo_labels[indices].to(targets.device)
         else:
             noisy_targets = targets
-            corrected_targets = self.model.valid_pseudo_labels[indices].to(
-                targets.device
-            )
+            corrected_targets = self.model.valid_pseudo_labels[indices].to(targets.device)
 
         _, noisy_targets = _check_input_type(logits, noisy_targets, self.loss_name)
-        _, corrected_targets = _check_input_type(
-            logits, corrected_targets, self.loss_name
-        )
+        _, corrected_targets = _check_input_type(logits, corrected_targets, self.loss_name)
         noisy_loss = self.loss(logits, noisy_targets)
         corrected_loss = self.loss(logits, corrected_targets)
         return (1 - self.alpha) * noisy_loss + self.alpha * corrected_loss

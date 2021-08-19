@@ -11,9 +11,7 @@ from torch.nn import Parameter
 
 
 class AdaCos(nn.Module):
-    def __init__(
-        self, in_features, out_features, m=0.50, ls_eps=0, theta_zero=math.pi / 4
-    ):
+    def __init__(self, in_features, out_features, m=0.50, ls_eps=0, theta_zero=math.pi / 4):
         super(AdaCos, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -41,9 +39,7 @@ class AdaCos(nn.Module):
         output = logits * (1 - one_hot) + target_logits * one_hot
         # feature re-scale
         with torch.no_grad():
-            B_avg = torch.where(
-                one_hot < 1, torch.exp(self.s * logits), torch.zeros_like(logits)
-            )
+            B_avg = torch.where(one_hot < 1, torch.exp(self.s * logits), torch.zeros_like(logits))
             B_avg = torch.sum(B_avg) / input.size(0)
             theta_med = torch.median(theta)
             self.s = torch.log(B_avg) / torch.cos(
@@ -56,17 +52,15 @@ class AdaCos(nn.Module):
 
 class ArcMarginProduct(nn.Module):
     r"""Implement of large margin arc distance: :
-        Args:
-            in_features: size of each input sample
-            out_features: size of each output sample
-            s: norm of input feature
-            m: margin
-            cos(theta + m)
-        """
+    Args:
+        in_features: size of each input sample
+        out_features: size of each output sample
+        s: norm of input feature
+        m: margin
+        cos(theta + m)
+    """
 
-    def __init__(
-        self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0
-    ):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
         super(ArcMarginProduct, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -238,8 +232,7 @@ def l2_norm(input, axis=1):
 
 
 class CurricularFace(nn.Module):
-    """Ref: https://github.com/HuangYG123/CurricularFace
-    """
+    """Ref: https://github.com/HuangYG123/CurricularFace"""
 
     def __init__(self, in_features, out_features, m=0.5, s=64.0):
         super(CurricularFace, self).__init__()
@@ -263,9 +256,7 @@ class CurricularFace(nn.Module):
         target_logit = cos_theta[torch.arange(0, embbedings.size(0)), label].view(-1, 1)
 
         sin_theta = torch.sqrt(1.0 - torch.pow(target_logit, 2))
-        cos_theta_m = (
-            target_logit * self.cos_m - sin_theta * self.sin_m
-        )  # cos(target+margin)
+        cos_theta_m = target_logit * self.cos_m - sin_theta * self.sin_m  # cos(target+margin)
         mask = cos_theta > cos_theta_m
         final_target_logit = torch.where(
             target_logit > self.threshold, cos_theta_m, target_logit - self.mm

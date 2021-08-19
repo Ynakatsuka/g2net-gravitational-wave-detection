@@ -103,8 +103,7 @@ class AGC(torch.optim.Optimizer):
                 trigger = grad_norm < max_norm
 
                 clipped_grad = p.grad * (
-                    max_norm
-                    / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
+                    max_norm / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
                 )
                 p.grad.data.copy_(torch.where(trigger, clipped_grad, p.grad))
 
@@ -143,7 +142,7 @@ class SGD_AGC(torch.optim.Optimizer):
                 v_{t+1} & = \mu * v_{t} + g_{t+1}, \\
                 p_{t+1} & = p_{t} - \text{lr} * v_{t+1},
             \end{aligned}
-        where :math:`p`, :math:`g`, :math:`v` and :math:`\mu` denote the 
+        where :math:`p`, :math:`g`, :math:`v` and :math:`\mu` denote the
         parameters, gradient, velocity, and momentum respectively.
         This is in contrast to Sutskever et. al. and
         other frameworks which employ an update of the form
@@ -220,8 +219,7 @@ class SGD_AGC(torch.optim.Optimizer):
                 trigger = grad_norm < max_norm
 
                 clipped_grad = p.grad * (
-                    max_norm
-                    / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
+                    max_norm / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
                 )
                 p.grad.data.copy_(torch.where(trigger, clipped_grad, p.grad))
 

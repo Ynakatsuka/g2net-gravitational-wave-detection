@@ -1,8 +1,9 @@
 import torch
-from kvt.models.heads import DINOHead
-from kvt.models.wrappers import MultiCropWrapper
 from lightly.models._momentum import _MomentumEncoderMixin
 from torch import nn
+
+from kvt.models.heads import DINOHead
+from kvt.models.wrappers import MultiCropWrapper
 
 
 class DINOModel(nn.Module, _MomentumEncoderMixin):
@@ -25,9 +26,7 @@ class DINOModel(nn.Module, _MomentumEncoderMixin):
         self._init_momentum_encoder()
 
         # multi-crop wrapper handles forward with inputs of different resolutions
-        self.backbone = MultiCropWrapper(
-            backbone, DINOHead(num_ftrs, out_dim, use_bn_in_head)
-        )
+        self.backbone = MultiCropWrapper(backbone, DINOHead(num_ftrs, out_dim, use_bn_in_head))
         self.momentum_backbone = MultiCropWrapper(
             self.momentum_backbone,
             DINOHead(

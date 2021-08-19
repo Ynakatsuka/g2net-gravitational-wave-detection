@@ -1,3 +1,3 @@
 #!/bin/bash
 docker-compose up -d --force-recreate
-docker-compose exec kaggle bash 
+docker-compose exec kaggle bash

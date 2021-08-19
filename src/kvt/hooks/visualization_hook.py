@@ -67,9 +67,7 @@ class VisualizationHookBase(object):
 
 class ScatterPlotVisualizationHook(VisualizationHookBase):
     def __call__(self, model, dataloader, predictions, targets):
-        df = pd.DataFrame(
-            {"predictions": predictions.flatten(), "targets": targets.flatten()}
-        )
+        df = pd.DataFrame({"predictions": predictions.flatten(), "targets": targets.flatten()})
         df.sort_values("predictions", inplace=True)
 
         vmin = min(predictions.min(), targets.min()) - targets.std() / 10
@@ -97,9 +95,7 @@ class LiftChartVisualizationHook(VisualizationHookBase):
         self.bins = bins
 
     def __call__(self, model, dataloader, predictions, targets):
-        df = pd.DataFrame(
-            {"predictions": predictions.flatten(), "targets": targets.flatten()}
-        )
+        df = pd.DataFrame({"predictions": predictions.flatten(), "targets": targets.flatten()})
         df.sort_values("predictions", inplace=True)
 
         chunk_size = np.ceil(len(df) / self.bins)
@@ -115,9 +111,7 @@ class LiftChartVisualizationHook(VisualizationHookBase):
 
 
 class HeatmapVisualizationHook(VisualizationHookBase):
-    def __init__(
-        self, dirpath, experiment_name, figsize=(20, 20), classes=None, normalize=True
-    ):
+    def __init__(self, dirpath, experiment_name, figsize=(20, 20), classes=None, normalize=True):
         super().__init__(dirpath, experiment_name, figsize)
         self.classes = classes
         self.normalize = normalize
@@ -293,9 +287,7 @@ class ShapTextVisualizationHook(VisualizationHookBase):
                 if len(x) == 1:
                     inputs[key] = x[0][key].unsqueeze(0).cuda()
                 else:
-                    inputs[key] = torch.cat(
-                        [v[key].unsqueeze(0).cuda() for v in x], dim=0
-                    )
+                    inputs[key] = torch.cat([v[key].unsqueeze(0).cuda() for v in x], dim=0)
             outputs = model(**inputs).detach().cpu().numpy()
             return outputs
 
@@ -356,4 +348,3 @@ class RawSampleVisualizationHook(VisualizationHookBase):
         plt.savefig(self.save_path)
 
         return self.result
-

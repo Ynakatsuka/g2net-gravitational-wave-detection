@@ -109,7 +109,7 @@ class G2NetDataset(BaseDataset):
     def _preprocess_input(self, x):
         """
         (max, min, mean, std)
-        overall: 
+        overall:
             [4.6152116e-20 -4.4294355e-20 4.3110074e-26 6.1481726e-21]
         per channel:
             [4.6152116e-20 4.1438353e-20 1.1161064e-20]
@@ -174,14 +174,12 @@ class G2NetDataset(BaseDataset):
             x = np.concatenate([np.expand_dims(whiten(x[i]), axis=0) for i in range(3)])
 
         if self.transform is not None:
-            _x = x
             x = np.concatenate(
                 [
                     np.expand_dims(self.transform(x[i], self.sample_rate), axis=0)
                     for i in range(3)
                 ]
             )
-            assert not np.array_equal(x, _x)
 
         if self.apply_bandpass:
             x = self.apply_bandpass_filter(x)

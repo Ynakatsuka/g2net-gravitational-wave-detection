@@ -1,7 +1,6 @@
 import inspect
 
 import numpy as np
-
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import log_loss, make_scorer, mean_squared_error
 from sklearn.model_selection import cross_val_score, train_test_split
@@ -42,9 +41,7 @@ class BaseSSLScorer:
 
 
 class BaseSSLCVScorer:
-    def __init__(
-        self, n_splits=5, random_state=42, apply_normalize=True, n_jobs=5, **kwargs
-    ):
+    def __init__(self, n_splits=5, random_state=42, apply_normalize=True, n_jobs=5, **kwargs):
         self.n_splits = n_splits
         self.random_state = random_state
         self.model_kwargs = kwargs

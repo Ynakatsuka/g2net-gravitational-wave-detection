@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 
-
 sigmoid = torch.nn.Sigmoid()
 
 
@@ -18,7 +17,9 @@ class Swish(torch.autograd.Function):
         sigmoid_i = sigmoid(i)
         return grad_output * (sigmoid_i * (1 + i * (1 - sigmoid_i)))
 
+
 swish = Swish.apply
+
 
 class SwishModule(nn.Module):
     def forward(self, x):

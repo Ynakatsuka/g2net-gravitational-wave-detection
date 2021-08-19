@@ -7,7 +7,7 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=all
     env_file:
-     - ./.env
+      - ./.env
     container_name: kaggle
     volumes:
       - $PWD:/home/working

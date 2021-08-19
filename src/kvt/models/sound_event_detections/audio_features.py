@@ -46,13 +46,9 @@ def compute_deltas(
 
     specgram = torch.nn.functional.pad(specgram, (n, n), mode=mode)
 
-    kernel = torch.arange(-n, n + 1, 1, device=device, dtype=dtype).repeat(
-        specgram.shape[1], 1, 1
-    )
+    kernel = torch.arange(-n, n + 1, 1, device=device, dtype=dtype).repeat(specgram.shape[1], 1, 1)
 
-    output = (
-        torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
-    )
+    output = torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
 
     # unpack batch
     output = output.reshape(shape)
@@ -120,9 +116,7 @@ class F2M(nn.Module):
         f_min (float): minimum frequency. default: 0
     """
 
-    def __init__(
-        self, n_mels=40, sr=16000, f_max=None, f_min=0.0, n_fft=40, onesided=True
-    ):
+    def __init__(self, n_mels=40, sr=16000, f_max=None, f_min=0.0, n_fft=40, onesided=True):
         super().__init__()
         self.n_mels = n_mels
         self.sr = sr
@@ -149,9 +143,9 @@ class F2M(nn.Module):
             f_m_plus = bins[m + 1].item()
 
             if f_m_minus != f_m:
-                fb[f_m_minus:f_m, m - 1] = (
-                    torch.arange(f_m_minus, f_m) - f_m_minus
-                ) / (f_m - f_m_minus)
+                fb[f_m_minus:f_m, m - 1] = (torch.arange(f_m_minus, f_m) - f_m_minus) / (
+                    f_m - f_m_minus
+                )
             if f_m != f_m_plus:
                 fb[f_m:f_m_plus, m - 1] = (f_m_plus - torch.arange(f_m, f_m_plus)) / (
                     f_m_plus - f_m

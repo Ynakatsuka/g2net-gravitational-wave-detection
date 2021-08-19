@@ -1,24 +1,14 @@
 from .bce import BCEWithLogitsLossAndIgnoreIndex
 from .combo import SegmentationWithClassificationHeadLoss
 from .dice import DiceLoss
-from .focal import (
-    BinaryDualFocalLoss,
-    BinaryFocalLoss,
-    BinaryReducedFocalLoss,
-    FocalLoss,
-    LabelSmoothBinaryFocalLoss,
-)
+from .focal import (BinaryDualFocalLoss, BinaryFocalLoss,
+                    BinaryReducedFocalLoss, FocalLoss,
+                    LabelSmoothBinaryFocalLoss)
 from .lovasz import LovaszHingeLoss, LovaszSoftmaxLoss
-from .noisy import (
-    IterativeSelfLearningLoss,
-    JointOptimizationLoss,
-    LabelSmoothingCrossEntropy,
-    OUSMLoss,
-    SymmetricBCELoss,
-    SymmetricBinaryFocalLoss,
-    SymmetricCrossEntropy,
-    coral_loss,
-)
+from .noisy import (IterativeSelfLearningLoss, JointOptimizationLoss,
+                    LabelSmoothingCrossEntropy, OUSMLoss, SymmetricBCELoss,
+                    SymmetricBinaryFocalLoss, SymmetricCrossEntropy,
+                    coral_loss)
 from .ohem import OHEMLoss, OHEMLossWithLogits
 from .rmse import RMSELoss
 from .ssl import DDINOLoss, DINOLoss

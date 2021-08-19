@@ -34,9 +34,7 @@ class DropStripes(nn.Module):
             batch_size = input.shape[0]
             total_width = input.shape[self.dim]
 
-            shuffle_batch = input[
-                torch.randint(low=0, high=batch_size, size=(batch_size,))
-            ]
+            shuffle_batch = input[torch.randint(low=0, high=batch_size, size=(batch_size,))]
 
             for n in range(batch_size):
                 self.transform_slice(input[n], total_width, shuffle_batch[n])

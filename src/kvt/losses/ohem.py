@@ -4,11 +4,7 @@ import torch.nn.functional as F
 
 
 def onehot_encoding(label, n_classes):
-    return (
-        torch.zeros(label.size(0), n_classes)
-        .to(label.device)
-        .scatter_(1, label.view(-1, 1), 1)
-    )
+    return torch.zeros(label.size(0), n_classes).to(label.device).scatter_(1, label.view(-1, 1), 1)
 
 
 def oh_cross_entropy_loss(input, target, reduction):
