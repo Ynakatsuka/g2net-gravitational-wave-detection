@@ -83,7 +83,6 @@ def run(config):
         optimizer=optimizer,
         scheduler=scheduler,
         hooks=hooks,
-        dataloaders=dataloaders,
         transform=transform,
         strong_transform=strong_transform,
         strong_transform_p=strong_transform_p,
@@ -138,7 +137,11 @@ def run(config):
         logger=logger, callbacks=callbacks, plugins=plugins, **config.trainer.trainer
     )
     if not config.trainer.skip_training:
-        trainer.fit(lightning_module)
+        trainer.fit(
+            lightning_module,
+            train_dataloaders=dataloaders["train"],
+            val_dataloaders=dataloaders["validation"],
+        )
 
     is_master = (
         (not is_ddp)
@@ -181,9 +184,7 @@ def run(config):
     if check_attr(config.trainer, "enable_final_evaluation"):
         lightning_module.enable_tta(tta_wrapper)
         trainer.validate(
-            val_dataloaders=lightning_module.val_dataloader(),
-            ckpt_path=None,
-            verbose=True,
+            val_dataloaders=dataloaders["validation"], ckpt_path=None, verbose=True,
         )
 
     # ------------------------------
@@ -195,7 +196,7 @@ def run(config):
         predictor = pl.Trainer(logger=logger, gpus=1)
         outputs = predictor.predict(
             model=lightning_module,
-            dataloaders=lightning_module.val_dataloader(),
+            dataloaders=dataloaders["validation"],
             return_predictions=True,
         )
         predictions = concatenate([o["y_hat"] for o in outputs])

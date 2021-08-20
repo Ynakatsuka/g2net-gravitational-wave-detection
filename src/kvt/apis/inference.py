@@ -1,14 +1,17 @@
 import os
 
+import kvt.utils
 import pytorch_lightning as pl
 import torch
-
-import kvt.utils
-from kvt.builder import (build_batch_transform, build_dataloaders, build_hooks,
-                         build_lightning_module, build_model,
-                         build_tta_wrapper)
-from kvt.utils import (check_attr, concatenate, replace_last_linear,
-                       save_predictions)
+from kvt.builder import (
+    build_batch_transform,
+    build_dataloaders,
+    build_hooks,
+    build_lightning_module,
+    build_model,
+    build_tta_wrapper,
+)
+from kvt.utils import check_attr, concatenate, replace_last_linear, save_predictions
 
 
 def run(config):
@@ -32,7 +35,7 @@ def run(config):
 
     # build lightning module
     lightning_module = build_lightning_module(
-        config, model=model, hooks=hooks, dataloaders=dataloaders, transform=transform
+        config, model=model, hooks=hooks, transform=transform
     )
 
     # ------------------------------
@@ -68,7 +71,7 @@ def run(config):
     predictor = pl.Trainer(gpus=1)
     outputs = predictor.predict(
         model=lightning_module,
-        dataloaders=lightning_module.test_dataloader(),
+        dataloaders=dataloaders["test"],
         return_predictions=True,
     )
     predictions = concatenate([o["y_hat"] for o in outputs])

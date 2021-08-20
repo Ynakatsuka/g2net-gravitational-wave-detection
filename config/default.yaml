@@ -35,6 +35,7 @@ defaults:
   - optimizer: default
   - trainer: default
   - experiment: null
+  - _self_
 
 hydra:
   # output paths for hydra logs

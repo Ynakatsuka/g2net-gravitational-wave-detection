@@ -9,7 +9,6 @@ class LightningModuleMLM(LightningModuleBase):
         optimizer=None,
         scheduler=None,
         hooks=None,
-        dataloaders=None,
         max_epochs=None,
         **kwargs
     ):
@@ -18,7 +17,6 @@ class LightningModuleMLM(LightningModuleBase):
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.hooks = hooks
-        self.dataloaders = dataloaders
         self.max_epochs = max_epochs
 
     def forward(self, x):

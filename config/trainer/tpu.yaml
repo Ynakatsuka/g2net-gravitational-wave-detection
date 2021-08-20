@@ -5,10 +5,10 @@ enable_final_evaluation: True
 idx_fold: 0
 
 train:
-  batch_size: 512
+  batch_size: 64
 
 evaluation:
-  batch_size: 512
+  batch_size: 64
   save_predictions: True
   dirpath: "${save_dir}/predictions/oof/${experiment_name}"
   filename: "fold_${trainer.idx_fold}.npy"

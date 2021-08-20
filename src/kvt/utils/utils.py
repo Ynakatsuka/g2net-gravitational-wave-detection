@@ -57,7 +57,7 @@ def update_experiment_name(config):
         if not config.experiment_name:
             config.experiment_name = "default"
 
-        if not config.trainer.logger.name:
+        if hasattr(config.trainer, "logger") and (not config.trainer.logger.name):
             config.trainer.logger.name = "default"
 
     return config
@@ -79,8 +79,5 @@ def save_predictions(predictions, dirpath, filename, split="validation"):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
 
-    path = os.path.join(
-        dirpath,
-        f"{split}_{filename}",
-    )
+    path = os.path.join(dirpath, f"{split}_{filename}",)
     np.save(path, predictions)
