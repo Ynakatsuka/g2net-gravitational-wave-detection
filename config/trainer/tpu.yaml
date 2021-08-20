@@ -5,10 +5,10 @@ enable_final_evaluation: True
 idx_fold: 0
 
 train:
-  batch_size: 64
+  batch_size: 16
 
 evaluation:
-  batch_size: 64
+  batch_size: 16
   save_predictions: True
   dirpath: "${save_dir}/predictions/oof/${experiment_name}"
   filename: "fold_${trainer.idx_fold}.npy"
@@ -28,7 +28,7 @@ trainer:
   amp_level: "O1"
   precision: 16
   val_check_interval: 0.2
-  tpu_cores: 8
+  tpu_cores: 1
   # sync_batchnorm: True
   benchmark: True
   deterministic: True

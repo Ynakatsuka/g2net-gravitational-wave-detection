@@ -20,7 +20,7 @@ optimizer:
   optimizer:
     name: "RAdam"
     params:
-      lr: 1e-02
+      lr: 3e-04
       weight_decay: 1e-6
 
 model:
