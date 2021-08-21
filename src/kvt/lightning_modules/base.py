@@ -211,7 +211,8 @@ class LightningModuleBase(pl.LightningModule):
         device = y.device
 
         if self.enable_numpy_evaluation:
-            y_hat, y = y_hat.cpu().numpy(), y.cpu().numpy()
+            y_hat = y_hat.cpu().numpy()
+            y = y.cpu().numpy()
 
         for name, func in self.hooks.metric_fn.items():
             result = func(y_hat, y)

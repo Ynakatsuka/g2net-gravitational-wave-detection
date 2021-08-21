@@ -18,22 +18,22 @@ defaults:
 # this allows you to overwrite only specified parameters
 trainer:
   train:
-    batch_size: 32
+    batch_size: 64
   evaluation:
-    batch_size: 32
+    batch_size: 64
   trainer:
-    max_epochs: 9
+    max_epochs: 8
     val_check_interval: 0.2
 
 optimizer:
   optimizer:
     name: "RAdam"
     params:
-      lr: 0.0006
+      lr: 2e-03
       weight_decay: 1e-6
 
 model:
   model:
     params:
       resize_shape: 256
-      hop_length: 8
+      hop_length: 16
