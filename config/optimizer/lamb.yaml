@@ -1,0 +1,11 @@
+optimizer:
+  name: "Lamb"
+  params:
+    lr: 5e-03
+    weight_decay: 1e-6
+
+scheduler:
+  name: "CosineAnnealingLR"
+  params:
+    T_max: 3
+    eta_min: 1e-6

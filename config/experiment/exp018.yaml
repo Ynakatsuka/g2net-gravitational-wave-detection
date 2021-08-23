@@ -37,3 +37,4 @@ model:
     params:
       resize_shape: 256
       hop_length: 16
+      use_spec_augmentation: True

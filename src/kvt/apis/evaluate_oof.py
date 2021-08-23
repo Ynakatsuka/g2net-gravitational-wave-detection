@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pandas as pd
 import torch
-
 from kvt.builder import build_logger, build_metrics
 
 
@@ -19,11 +18,11 @@ def run(config):
     fold_column = config.fold.fold_column
     target_column = config.competition.target_column
     num_fold = config.fold.fold.n_splits
-    input_dir = config.input_dir
+    save_dir = config.save_dir
     csv_filename = config.fold.csv_filename
 
     # load train DataFrame
-    load_train_path = os.path.join(input_dir, csv_filename)
+    load_train_path = os.path.join(save_dir, csv_filename)
     train = pd.read_csv(load_train_path)
     y_train = train[target_column]
 
@@ -39,9 +38,9 @@ def run(config):
             loaded_object = loaded_object.flatten()
         y_pred[valid_idx] = loaded_object
 
-    if hasattr(config.lightning_module.lightning_module.params, "enable_numpy_evaluation") and (
-        not config.lightning_module.lightning_module.params.enable_numpy_evaluation
-    ):
+    if hasattr(
+        config.lightning_module.lightning_module.params, "enable_numpy_evaluation"
+    ) and (not config.lightning_module.lightning_module.params.enable_numpy_evaluation):
         y_train = torch.tensor(y_train)
         y_pred = torch.tensor(y_pred)
 

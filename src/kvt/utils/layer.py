@@ -1,11 +1,15 @@
 import torch
 import torch.nn as nn
-
-from kvt.models.heads import (AdaCos, AddMarginProduct, ArcMarginProduct,
-                              CurricularFace, MultiSampleDropout,
-                              SphereProduct)
+from kvt.models.heads import (
+    AdaCos,
+    AddMarginProduct,
+    ArcMarginProduct,
+    CurricularFace,
+    MultiSampleDropout,
+    SphereProduct,
+)
 from kvt.models.layers import Flatten, Identity, SEBlock
-from kvt.models.necks import RMAC, AdaptiveConcatPool2d, GeM, Rpool
+from kvt.models.necks import RMAC, AdaptiveConcatPool2d, GeM, Rpool, TripletAttention
 from kvt.models.wrappers import MetricLearningModelWrapper
 
 
@@ -46,6 +50,9 @@ def replace_last_linear(
     n_last_linear_layers=0,
     multi_sample_dropout_p=0.5,
     n_multi_samples=5,
+    # neck
+    apply_triplet_attention=False,
+    gem_p=3,
     # for metric learing
     s=64.0,
     m=0.5,
@@ -66,32 +73,44 @@ def replace_last_linear(
         raise ValueError(f"Invalid last linear type: {last_linear_type}")
 
     # replace pooling
-    def replace_pooling_layer(original, layer_name):
+    def replace_pooling_layer(original, layer_name, apply_triplet_attention=False):
+        neck = []
+
+        if apply_triplet_attention:
+            neck.append(TripletAttention())
+
         fc_input_shape_ratio = 1
         if pool_type == "concat":
-            setattr(original, layer_name, AdaptiveConcatPool2d())
+            neck.append(AdaptiveConcatPool2d())
             fc_input_shape_ratio = 2
         elif pool_type == "avg":
-            setattr(original, layer_name, nn.AdaptiveAvgPool2d((1, 1)))
+            neck.append(nn.AdaptiveAvgPool2d((1, 1)))
         elif pool_type == "adaptive_avg":
-            setattr(original, layer_name, nn.AdaptiveAvgPool2d((10, 10)))
+            neck.append(nn.AdaptiveAvgPool2d((10, 10)))
             fc_input_shape_ratio = 100
         elif pool_type == "gem":
-            setattr(original, layer_name, GeM())
+            neck.append(GeM(p=gem_p))
         elif pool_type == "identity":
-            setattr(original, layer_name, Identity())
+            neck.append(Identity())
         elif pool_type == "rmac":
-            setattr(original, layer_name, RMAC())
+            neck.append(RMAC())
         elif pool_type == "rpool":
-            setattr(original, layer_name, Rpool())
+            neck.append(Rpool())
 
+        neck = nn.Sequential(*neck)
+        setattr(original, layer_name, neck)
+        print(f"[Replace Neck] {getattr(original, layer_name)}")
         return fc_input_shape_ratio
 
     for layer_name in ["avgpool", "global_pool"]:
         if hasattr(model, layer_name):
-            fc_input_shape_ratio = replace_pooling_layer(model, layer_name)
+            fc_input_shape_ratio = replace_pooling_layer(
+                model, layer_name, apply_triplet_attention
+            )
         elif hasattr(model, "head") and hasattr(model.head, layer_name):
-            fc_input_shape_ratio = replace_pooling_layer(model.head, layer_name)
+            fc_input_shape_ratio = replace_pooling_layer(
+                model.head, layer_name, apply_triplet_attention
+            )
         else:
             fc_input_shape_ratio = 1
 
@@ -125,9 +144,13 @@ def replace_last_linear(
                 )
             )
         elif (last_linear_type == "multi_head") and (num_classes_list is not None):
-            last_layers.append(MultiHead(in_features, num_classes_list, head_names, dropout_rate))
+            last_layers.append(
+                MultiHead(in_features, num_classes_list, head_names, dropout_rate)
+            )
         elif last_linear_type == "linear":
-            last_layers.extend([nn.Dropout(dropout_rate), nn.Linear(in_features, num_classes)])
+            last_layers.extend(
+                [nn.Dropout(dropout_rate), nn.Linear(in_features, num_classes)]
+            )
 
         last_layers = nn.Sequential(*last_layers)
 
