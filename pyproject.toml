@@ -7,7 +7,12 @@ enable_flake8 = true
 enable_isort = true
 enable_mypy = false
 mypy_preset = "strict"
-line_length = 88
+line_length = 79
 py_version = "py37"
+isort_known_first_party = ["fakes", "pysen"]
+
 [[tool.pysen.lint.mypy_targets]]
   paths = ["."]
+
+[tool.pysen.lint.source]
+  excludes = [".git", "logs/", "notebook/", "data/", "tests/"]

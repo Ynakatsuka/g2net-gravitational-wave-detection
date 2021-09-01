@@ -42,6 +42,11 @@ python run.py trainer.model.params.backbone.name=densenet121
 python run.py run=inference
 ```
 
+```
+pysen run lint
+pysen run format
+```
+
 ## Others
 <details>
 <summary><b>Create a sweep over hyperparameters</b></summary>
