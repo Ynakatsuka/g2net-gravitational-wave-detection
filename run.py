@@ -3,19 +3,19 @@ import pprint
 import sys
 import warnings
 
+import custom  # import all custom modules for registering objects.
 import hydra
 import pytorch_lightning as pl
 from easydict import EasyDict as edict
-from omegaconf import DictConfig, OmegaConf
-
-# local libraries
-sys.path.append("src/")
-import custom  # import all custom modules for registering objects.
 from kvt.apis.evaluate_oof import run as run_evaluate_oof
 from kvt.apis.inference import run as run_inference
 from kvt.apis.train import run as run_train
 from kvt.initialization import initialize
 from kvt.utils import update_experiment_name
+from omegaconf import DictConfig, OmegaConf
+
+# local libraries
+sys.path.append("src/")
 
 
 def train(config):
