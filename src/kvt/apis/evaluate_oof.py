@@ -4,6 +4,7 @@ import os
 import numpy as np
 import pandas as pd
 import torch
+
 from kvt.builder import build_logger, build_metrics
 
 
@@ -38,9 +39,9 @@ def run(config):
             loaded_object = loaded_object.flatten()
         y_pred[valid_idx] = loaded_object
 
-    if hasattr(
-        config.lightning_module.lightning_module.params, "enable_numpy_evaluation"
-    ) and (not config.lightning_module.lightning_module.params.enable_numpy_evaluation):
+    if hasattr(config.lightning_module.lightning_module.params, "enable_numpy_evaluation") and (
+        not config.lightning_module.lightning_module.params.enable_numpy_evaluation
+    ):
         y_train = torch.tensor(y_train)
         y_pred = torch.tensor(y_pred)
 

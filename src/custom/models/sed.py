@@ -1,3 +1,4 @@
+import math
 from functools import partial
 
 import kvt
@@ -8,9 +9,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from kvt.augmentation import SpecAugmentationPlusPlus
 from kvt.models.layers import AttBlockV2
-from kvt.models.sound_event_detections import (Loudness, PCENTransform,
-                                               add_frequency_encoding,
-                                               add_time_encoding, make_delta)
+from kvt.models.sound_event_detections import (
+    Loudness,
+    PCENTransform,
+    add_frequency_encoding,
+    add_time_encoding,
+    make_delta,
+)
 from nnAudio.Spectrogram import CQT1992v2, CQT2010v2
 from torchlibrosa.augmentation import SpecAugmentation
 from torchvision import transforms
@@ -99,9 +104,8 @@ class G2Net(nn.Module):
             self.spectrogram_extractor = lambda x: func(x).abs()
         elif spectrogram_method == "CWT":
             self.spectrogram_extractor = CWT(widths=widths)
-
         else:
-            raise ValueError
+            self.spectrogram_extractor = None
 
         # Spec augmenter
         self.spec_augmenter = None
@@ -137,12 +141,15 @@ class G2Net(nn.Module):
     def forward(
         self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False
     ):
-        # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
-        # e.g., [256, 3, 54, 129]
-        x = []
-        for i in range(input.shape[1]):
-            x.append(self.spectrogram_extractor(input[:, i, :]).unsqueeze(1))
-        x = torch.cat(x, dim=1)
+        if self.spectrogram_extractor is not None:
+            # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
+            # e.g., [256, 3, 54, 129]
+            x = []
+            for i in range(input.shape[1]):
+                x.append(self.spectrogram_extractor(input[:, i, :]).unsqueeze(1))
+            x = torch.cat(x, dim=1)
+        else:
+            x = input
 
         if return_spectrogram:
             return x
@@ -333,3 +340,27 @@ class AttentionG2Net(G2Net):
         output = torch.sum(norm_att * self.att_block.cla(x), dim=2)
 
         return output
+
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+        super().__init__()
+        self.dropout = nn.Dropout(p=dropout)
+
+        position = torch.arange(max_len).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model)
+        )
+        pe = torch.zeros(max_len, 1, d_model)
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe)
+
+    def forward(self, x):
+        """
+        Args:
+            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+        """
+        x = x + self.pe[: x.size(0)]
+        return self.dropout(x)
+

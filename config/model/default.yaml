@@ -10,7 +10,7 @@ model:
     spectrogram_method: "CQT" # STFT, CQT
     hop_length: 32
     bins_per_octave: 8
-    sample_rate: ${dataset.dataset.0.params.sample_rate}
+    sample_rate: 2048
     fmin: 10
     fmax: 1024
     window: "hann"
@@ -40,5 +40,9 @@ loss:
 metrics:
   roc:
     name: "sklearn_roc_auc_score"
+  pr:
+    name: "sklearn_precision_score"
+  rc:
+    name: "sklearn_recall_score"
   # hard_roc:
   # name: "hard_sample_roc_auc_score"

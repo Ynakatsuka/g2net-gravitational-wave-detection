@@ -180,11 +180,13 @@ def run(config):
     # ------------------------------
     # Evaluate
     # ------------------------------
-    # evaluate
     if check_attr(config.trainer, "enable_final_evaluation"):
         lightning_module.enable_tta(tta_wrapper)
         trainer.validate(
-            val_dataloaders=dataloaders["validation"], ckpt_path=None, verbose=True,
+            model=lightning_module,
+            dataloaders=dataloaders["validation"],
+            ckpt_path=None,
+            verbose=True,
         )
 
     # ------------------------------
@@ -212,4 +214,7 @@ def run(config):
             )
 
         # visualization
-        lightning_module.run_visualization(predictions, targets)
+        lightning_module.run_visualization(
+            predictions, targets, dataloaders["validation"]
+        )
+

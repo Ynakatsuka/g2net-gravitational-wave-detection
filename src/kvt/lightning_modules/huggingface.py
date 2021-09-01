@@ -38,7 +38,7 @@ class LightningModuleMLM(LightningModuleBase):
             if key not in ("y", "y_hat"):
                 avg_outputs[key] = value.mean()
 
-        if not self.trainer.running_sanity_check:
+        if not self.trainer.sanity_checking:
             self.log_dict(avg_outputs, on_epoch=True, prog_bar=True, logger=True)
 
         return avg_outputs

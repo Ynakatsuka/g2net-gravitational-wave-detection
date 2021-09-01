@@ -42,7 +42,7 @@ class ZPool(nn.Module):
 
 
 class AttentionGate(nn.Module):
-    def __init__(self, kernel_size=7):
+    def __init__(self, kernel_size=13):
         super(AttentionGate, self).__init__()
         self.zpool = ZPool()
         self.conv = ConvBnAct(

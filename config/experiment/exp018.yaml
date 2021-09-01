@@ -17,6 +17,7 @@ defaults:
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 trainer:
+  # auto_resume_from_checkpoint: True
   train:
     batch_size: 64
   evaluation:
@@ -24,6 +25,7 @@ trainer:
   trainer:
     max_epochs: 5
     val_check_interval: 0.2
+    resume_from_checkpoint: "${save_dir}/models/${experiment_name}/fold_0_epoch=000-v1.ckpt"
 
 optimizer:
   optimizer:

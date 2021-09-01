@@ -1,4 +1,5 @@
 import inspect
+import os
 
 import numpy as np
 import pytorch_lightning as pl
@@ -34,8 +35,12 @@ class LightningModuleBase(pl.LightningModule):
         self.hooks = hooks
         self.strong_transform = strong_transform
         self.strong_transform_p = strong_transform_p
-        self.disable_strong_transform_in_first_epochs = disable_strong_transform_in_first_epochs
-        self.disable_strong_transform_in_last_epochs = disable_strong_transform_in_last_epochs
+        self.disable_strong_transform_in_first_epochs = (
+            disable_strong_transform_in_first_epochs
+        )
+        self.disable_strong_transform_in_last_epochs = (
+            disable_strong_transform_in_last_epochs
+        )
         self.enable_overall_evaluation = enable_overall_evaluation
         self.enable_numpy_evaluation = enable_numpy_evaluation
         self.monitor = monitor
@@ -50,7 +55,9 @@ class LightningModuleBase(pl.LightningModule):
         elif isinstance(transform, dict):
             keys = transform.keys()
             self.train_transform = transform["train"] if "train" in keys else None
-            self.valid_transform = transform["validation"] if "validation" in keys else None
+            self.valid_transform = (
+                transform["validation"] if "validation" in keys else None
+            )
             self.test_transform = transform["test"] if "test" in keys else None
         else:
             raise TypeError
@@ -74,22 +81,25 @@ class LightningModuleBase(pl.LightningModule):
             self.model = tta_wrapper
             self.tta_enabled = True
 
-    def run_visualization(self, predictions, targets):
+    def run_visualization(self, predictions, targets, dataloader=None):
         visualization_result = {}
-        if hasattr(self.hooks, "visualization") and (self.hooks.visualization is not None):
+        if hasattr(self.hooks, "visualization") and (
+            self.hooks.visualization is not None
+        ):
             funcs = self.hooks.visualization
             if isinstance(funcs, list):
                 for func in funcs:
-                    r = func(self.model, self.val_dataloader(), predictions, targets)
+                    r = func(self.model, dataloader, predictions, targets, self.logger)
                     visualization_result.update(r)
             else:
-                r = funcs(self.model, self.val_dataloader(), predictions, targets)
+                r = funcs(self.model, dataloader, predictions, targets, self.logger)
                 visualization_result.update(r)
 
             # log
             if isinstance(self.logger, pl.loggers.WandbLogger):
                 for key, value in visualization_result.items():
-                    self.logger.experiment.log({key: [wandb.Image(value)]})
+                    if os.path.exists(value):
+                        self.logger.experiment.log({key: [wandb.Image(value)]})
             else:
                 print(f"Log artifacts is not supported for {type(self.logger)}")
 
@@ -119,7 +129,8 @@ class LightningModuleBase(pl.LightningModule):
             and (
                 (
                     self.current_epoch
-                    <= self.trainer.max_epochs - self.disable_strong_transform_in_last_epochs
+                    <= self.trainer.max_epochs
+                    - self.disable_strong_transform_in_last_epochs
                 )
                 or (self.current_epoch > self.disable_strong_transform_in_first_epochs)
             )
@@ -127,9 +138,9 @@ class LightningModuleBase(pl.LightningModule):
         ):
             x, y_a, y_b, lam, idx = self.strong_transform(x, y)
             y_hat = self.forward(x, **aux_x)
-            loss = lam * self.hooks.loss_fn(y_hat, y_a, **aux_y) + (1 - lam) * self.hooks.loss_fn(
-                y_hat, y_b, **aux_y
-            )
+            loss = lam * self.hooks.loss_fn(y_hat, y_a, **aux_y) + (
+                1 - lam
+            ) * self.hooks.loss_fn(y_hat, y_b, **aux_y)
         else:
             y_hat = self.forward(x, **aux_x)
             loss = self.hooks.loss_fn(y_hat, y, **aux_y)
@@ -167,7 +178,9 @@ class LightningModuleBase(pl.LightningModule):
             main_input_key = main_input_key[0]
 
             aux_x = {
-                k: v for k, v in batch.items() if k not in main_input_key + self.main_target_keys
+                k: v
+                for k, v in batch.items()
+                if k not in main_input_key + self.main_target_keys
             }
             x = batch[main_input_key]
 
@@ -237,7 +250,9 @@ class LightningModuleBase(pl.LightningModule):
                 outputs["y_hat"] = y_hat
                 outputs["y"] = y
             else:
-                metric_outputs = self._calculate_evaluation(y_hat, y, suffix="_batch_mean")
+                metric_outputs = self._calculate_evaluation(
+                    y_hat, y, suffix="_batch_mean"
+                )
                 outputs.update(metric_outputs)
         return outputs
 
@@ -256,7 +271,9 @@ class LightningModuleBase(pl.LightningModule):
                 value = torch.stack([o[key] for o in outputs])
 
             if torch.distributed.is_initialized():
-                gathered_value = [torch.zeros_like(value) for _ in range(dist.get_world_size())]
+                gathered_value = [
+                    torch.zeros_like(value) for _ in range(dist.get_world_size())
+                ]
                 dist.all_gather(gathered_value, value)
                 gathered_outputs[key] = torch.cat(gathered_value)
             else:
@@ -278,8 +295,10 @@ class LightningModuleBase(pl.LightningModule):
             )
             avg_outputs.update(metric_outputs)
 
-        if not self.trainer.running_sanity_check:
-            self.log_dict(avg_outputs, on_epoch=True, prog_bar=True, logger=True, sync_dist=True)
+        if not self.trainer.sanity_checking:
+            self.log_dict(
+                avg_outputs, on_epoch=True, prog_bar=True, logger=True, sync_dist=True
+            )
 
         return avg_outputs
 

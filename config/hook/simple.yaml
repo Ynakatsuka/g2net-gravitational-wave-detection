@@ -1,0 +1,12 @@
+hooks:
+  post_forward:
+    name: SigmoidPostForwardHook
+  visualizations:
+    - name: ScatterPlotVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}
+    - name: LiftChartVisualizationHook
+      params:
+        dirpath: "${save_dir}/visualizations"
+        experiment_name: ${experiment_name}

@@ -1,0 +1,42 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: batch_noise
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: simple
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+trainer:
+  train:
+    batch_size: 32
+  evaluation:
+    batch_size: 32
+  trainer:
+    max_epochs: 10
+    val_check_interval: 0.2
+    resume_from_checkpoint: "${save_dir}/models/experiment=exp017/fold_${trainer.idx_fold}_best.ckpt"
+
+optimizer:
+  optimizer:
+    name: "RAdam"
+    params:
+      lr: 1e-03
+      weight_decay: 1e-6
+
+model:
+  model:
+    params:
+      resize_shape: 256
+      hop_length: 16
+      backbone:
+        name: "tf_efficientnet_b2_ns"

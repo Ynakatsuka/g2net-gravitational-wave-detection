@@ -11,9 +11,19 @@ from torch.utils.data import DataLoader
 
 import kvt
 import kvt.augmentation
-from kvt.registry import (CALLBACKS, COLLATE_FNS, DATASETS, HOOKS,
-                          LIGHTNING_MODULES, LOSSES, METRICS, OPTIMIZERS,
-                          SAMPLERS, SCHEDULERS, TRANSFORMS)
+from kvt.registry import (
+    CALLBACKS,
+    COLLATE_FNS,
+    DATASETS,
+    HOOKS,
+    LIGHTNING_MODULES,
+    LOSSES,
+    METRICS,
+    OPTIMIZERS,
+    SAMPLERS,
+    SCHEDULERS,
+    TRANSFORMS,
+)
 from kvt.utils import build_from_config
 
 
@@ -26,7 +36,9 @@ def build_collate_fn(config, dataset, split, **kwargs):
             if hasattr(dataset, "tokenizer"):
                 kwargs["tokenizer"] = dataset.tokenizer
 
-            collate_fn = build_from_config(getattr(cfg, split), COLLATE_FNS, default_args=kwargs)
+            collate_fn = build_from_config(
+                getattr(cfg, split), COLLATE_FNS, default_args=kwargs
+            )
 
     return collate_fn
 
@@ -37,12 +49,14 @@ def build_sampler(config, dataset, split, **kwargs):
     if hasattr(config.dataset, "sampler"):
         cfg = config.dataset.sampler
         if hasattr(cfg, split):
-            sampler = build_from_config(getattr(cfg, split), SAMPLERS, default_args=kwargs)
+            sampler = build_from_config(
+                getattr(cfg, split), SAMPLERS, default_args=kwargs
+            )
 
     return sampler
 
 
-def build_dataloaders(config):
+def build_dataloaders(config, drop_last=None, shuffle=None):
     dataloaders = {}
     dataset_configs = config.dataset.dataset
 
@@ -92,13 +106,16 @@ def build_dataloaders(config):
             # build dataloader parameters
             collate_fn = build_collate_fn(config, dataset, split=split)
             sampler = build_sampler(config, dataset, split=split)
-            shuffle = is_train if sampler is None else False
+
+            _shuffle = is_train if sampler is None else False
+            _shuffle = _shuffle if shuffle is None else shuffle
+            _drop_last = is_train if drop_last is None else drop_last
 
             dataloader = DataLoader(
                 dataset,
-                shuffle=shuffle,
+                shuffle=_shuffle,
                 batch_size=batch_size,
-                drop_last=is_train,
+                drop_last=_drop_last,
                 num_workers=config.dataset.transform.num_preprocessor,
                 pin_memory=True,
                 collate_fn=collate_fn,
@@ -124,7 +141,9 @@ def build_optimizer(config, model=None, **kwargs):
     cfg = config.optimizer.optimizer
     if cfg.name == "AGC":
         # optimizer: instance
-        base_optimizer = build_from_config(cfg.params.base, OPTIMIZERS, default_args=kwargs)
+        base_optimizer = build_from_config(
+            cfg.params.base, OPTIMIZERS, default_args=kwargs
+        )
         optimizer = getattr(kvt.optimizers, cfg.name)(
             model.parameters(),
             base_optimizer,
@@ -133,10 +152,11 @@ def build_optimizer(config, model=None, **kwargs):
         )
     elif cfg.name == "Lookahead":
         # optimizer: instance
-        base_optimizer = build_from_config(cfg.params.base, OPTIMIZERS, default_args=kwargs)
+        base_optimizer = build_from_config(
+            cfg.params.base, OPTIMIZERS, default_args=kwargs
+        )
         optimizer = getattr(optim, cfg.name)(
-            base_optimizer,
-            **{k: v for k, v in cfg.params.items() if k != "base"},
+            base_optimizer, **{k: v for k, v in cfg.params.items() if k != "base"},
         )
     elif cfg.name == "SAM":
         # optimizer: class
@@ -156,7 +176,9 @@ def build_scheduler(config, **kwargs):
     if config.optimizer.scheduler is None:
         return None
 
-    scheduler = build_from_config(config.optimizer.scheduler, SCHEDULERS, default_args=kwargs)
+    scheduler = build_from_config(
+        config.optimizer.scheduler, SCHEDULERS, default_args=kwargs
+    )
 
     return scheduler
 
@@ -212,11 +234,19 @@ def build_hooks(config):
 
     # build default hooks
     post_forward_hook_config = {"name": "DefaultPostForwardHook"}
-    if (hooks is not None) and ("post_forward" in hooks) and (hooks.post_forward is not None):
+    if (
+        (hooks is not None)
+        and ("post_forward" in hooks)
+        and (hooks.post_forward is not None)
+    ):
         post_forward_hook_config.update(hooks.post_forward)
 
     visualization_hook_configs = []
-    if (hooks is not None) and ("visualizations" in hooks) and (hooks.visualizations is not None):
+    if (
+        (hooks is not None)
+        and ("visualizations" in hooks)
+        and (hooks.visualizations is not None)
+    ):
         if isinstance(hooks.visualizations, list):
             visualization_hook_configs.extend(hooks.visualizations)
         else:
@@ -242,7 +272,9 @@ def build_strong_transform(config):
         p = strong_cfg.params.p
         params = {k: v for k, v in strong_cfg.params.items() if k != "p"}
         if hasattr(kvt.augmentation, strong_cfg.name):
-            strong_transform = partial(getattr(kvt.augmentation, strong_cfg.name), **params)
+            strong_transform = partial(
+                getattr(kvt.augmentation, strong_cfg.name), **params
+            )
     return strong_transform, p
 
 

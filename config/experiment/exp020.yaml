@@ -1,0 +1,80 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: batch_noise
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+trainer:
+  train:
+    batch_size: 48
+  evaluation:
+    batch_size: 48
+  trainer:
+    max_epochs: 5
+    # val_check_interval: 0.2
+    # resume_from_checkpoint: "${save_dir}/models/${experiment_name}/fold_${trainer.idx_fold}_best.ckpt"
+    # resume_from_checkpoint: "${save_dir}/models/${experiment_name}/fold_1_epoch=000.ckpt"
+
+optimizer:
+  optimizer:
+    name: "RAdam"
+    params:
+      lr: 1e-03
+      weight_decay: 1e-6
+
+model:
+  model:
+    params:
+      resize_shape: 256
+      hop_length: 16
+      backbone:
+        name: "tf_efficientnet_b2_ns"
+
+dataset:
+  dataset:
+    - name: "G2NetDataset"
+      params:
+        csv_filename: ${fold.csv_filename}
+        input_column: "id"
+        target_column: ${competition.target_column}
+        target_unique_values: ${competition.target_unique_values}
+        input_dir: ${input_dir}
+        extension: ".npy"
+        num_fold: 5
+        idx_fold: ${trainer.idx_fold}
+        sample_rate: 2048
+        bandpass_filters: 8
+        bandpass_lower_freq: 20
+        bandpass_higher_freq: 500
+        predictions_dirname_for_pseudo_labeling: "${save_dir}/predictions/test/experiment=exp017"
+        test_csv_filename: "sample_submission.csv"
+        test_images_dir: "test"
+        csv_input_dir: ${save_dir}
+        label_confidence_threshold: null
+      splits:
+        - split: "train"
+        - split: "validation"
+    - name: "G2NetDataset"
+      params:
+        csv_filename: "sample_submission.csv"
+        input_column: "id"
+        input_dir: ${input_dir}
+        extension: ".npy"
+        sample_rate: 2048
+        bandpass_filters: 8
+        bandpass_lower_freq: 20
+        bandpass_higher_freq: 500
+      splits:
+        - split: "test"

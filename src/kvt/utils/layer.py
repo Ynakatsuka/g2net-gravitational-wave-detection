@@ -1,15 +1,12 @@
 import torch
 import torch.nn as nn
-from kvt.models.heads import (
-    AdaCos,
-    AddMarginProduct,
-    ArcMarginProduct,
-    CurricularFace,
-    MultiSampleDropout,
-    SphereProduct,
-)
+
+from kvt.models.heads import (AdaCos, AddMarginProduct, ArcMarginProduct,
+                              CurricularFace, MultiSampleDropout,
+                              SphereProduct)
 from kvt.models.layers import Flatten, Identity, SEBlock
-from kvt.models.necks import RMAC, AdaptiveConcatPool2d, GeM, Rpool, TripletAttention
+from kvt.models.necks import (RMAC, AdaptiveConcatPool2d, GeM, Rpool,
+                              TripletAttention)
 from kvt.models.wrappers import MetricLearningModelWrapper
 
 
@@ -144,13 +141,9 @@ def replace_last_linear(
                 )
             )
         elif (last_linear_type == "multi_head") and (num_classes_list is not None):
-            last_layers.append(
-                MultiHead(in_features, num_classes_list, head_names, dropout_rate)
-            )
+            last_layers.append(MultiHead(in_features, num_classes_list, head_names, dropout_rate))
         elif last_linear_type == "linear":
-            last_layers.extend(
-                [nn.Dropout(dropout_rate), nn.Linear(in_features, num_classes)]
-            )
+            last_layers.extend([nn.Dropout(dropout_rate), nn.Linear(in_features, num_classes)])
 
         last_layers = nn.Sequential(*last_layers)
 

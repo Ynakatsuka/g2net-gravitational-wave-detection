@@ -1,11 +1,10 @@
 import os
 
+import kvt
 import numpy as np
 import torch
-from scipy import signal, stats
-
-import kvt
 from kvt.datasets import BaseDataset
+from scipy import signal, stats
 
 
 def whiten(signal):
@@ -40,6 +39,7 @@ class G2NetDataset(BaseDataset):
         predictions_dirname_for_pseudo_labeling=None,
         test_csv_filename=None,
         test_images_dir=None,
+        label_confidence_threshold=None,
         # for audio
         sample_rate=2048,
         normalize_mode=None,
@@ -49,6 +49,8 @@ class G2NetDataset(BaseDataset):
         bandpass_filters=4,
         ignore_head_frames=0,
         apply_whiten=False,
+        bandstop_freq=None,
+        bandstop_quality=None,
         **params,
     ):
         super().__init__(
@@ -71,16 +73,26 @@ class G2NetDataset(BaseDataset):
             predictions_dirname_for_pseudo_labeling,
             test_csv_filename,
             test_images_dir,
+            label_confidence_threshold,
             **params,
         )
         self.sample_rate = sample_rate
         self.normalize_mode = normalize_mode
+
         self.apply_bandpass = apply_bandpass
         self.ignore_head_frames = ignore_head_frames
         self.apply_whiten = apply_whiten
 
         Wn = (bandpass_lower_freq, bandpass_higher_freq)
-        self.b, self.a = signal.butter(bandpass_filters, Wn, btype="bandpass", fs=sample_rate)
+        self.b, self.a = signal.butter(
+            bandpass_filters, Wn, btype="bandpass", fs=sample_rate
+        )
+        self.bandstop_freq = bandstop_freq
+        self.bandstop_quality = bandstop_quality
+        if self.bandstop_freq is not None:
+            self.bandstop_b, self.bandstop_a = signal.iirnotch(
+                bandstop_freq, bandstop_quality, sample_rate
+            )
 
     def _load(self, path):
         x = np.load(path)
@@ -89,12 +101,7 @@ class G2NetDataset(BaseDataset):
     def _extract_path_to_input_from_input_column(self, df):
         inputs = df[self.input_column].apply(
             lambda x: os.path.join(
-                self.input_dir,
-                self.images_dir,
-                x[0],
-                x[1],
-                x[2],
-                x + self.extension,
+                self.input_dir, self.images_dir, x[0], x[1], x[2], x + self.extension,
             )
         )
         if self.test_images_dir is not None:
@@ -157,13 +164,25 @@ class G2NetDataset(BaseDataset):
         elif self.normalize_mode == 11:
             x -= x.min() + 1e-07
             x /= x.max()
-            x = np.concatenate([np.expand_dims(stats.boxcox(x[i])[0], axis=0) for i in range(3)])
+            x = np.concatenate(
+                [np.expand_dims(stats.boxcox(x[i])[0], axis=0) for i in range(3)]
+            )
             return x
         else:
             return (x - 4.3110074e-26) / 6.1481726e-21
 
-    def apply_bandpass_filter(self, waves):
-        return np.array([signal.filtfilt(self.b, self.a, wave) for wave in waves])
+    def apply_filter(self, waves):
+        # bandstop
+        if self.bandstop_freq is not None:
+            waves = np.array(
+                [
+                    signal.filtfilt(self.bandstop_b, self.bandstop_a, wave)
+                    for wave in waves
+                ]
+            )
+        # bandpass
+        waves = np.array([signal.filtfilt(self.b, self.a, wave) for wave in waves])
+        return waves
 
     def __getitem__(self, idx):
         if self.enable_load:
@@ -179,16 +198,50 @@ class G2NetDataset(BaseDataset):
 
         if self.transform is not None:
             x = np.concatenate(
-                [np.expand_dims(self.transform(x[i], self.sample_rate), axis=0) for i in range(3)]
+                [
+                    np.expand_dims(self.transform(x[i], self.sample_rate), axis=0)
+                    for i in range(3)
+                ]
             )
 
         if self.apply_bandpass:
-            x = self.apply_bandpass_filter(x)
+            x = self.apply_filter(x)
 
         if self.ignore_head_frames > 0:
             x = x[:, self.ignore_head_frames :]
 
         x = x.astype("float32")
+
+        if self.return_input_as_x:
+            inputs = {"x": x}
+        else:
+            inputs = x
+
+        if self.targets is not None:
+            inputs["y"] = self._preprocess_target(self.targets[idx])
+
+        return inputs
+
+
+@kvt.DATASETS.register
+class G2NetImageDataset(BaseDataset):
+    def _load(self, path):
+        x = np.load(path)
+        return x
+
+    def __getitem__(self, idx):
+        if self.enable_load:
+            path = self.inputs[idx]
+            x = self._load(path)
+        else:
+            x = self.inputs[idx]
+
+        if self.transform is not None:
+            x = x.transpose(1, 2, 0)
+            x = self.transform(x)
+            # x = x.transpose(2, 0, 1)
+
+        x = self._preprocess_input(x)
 
         if self.return_input_as_x:
             inputs = {"x": x}

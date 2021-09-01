@@ -61,13 +61,15 @@ class VisualizationHookBase(object):
         os.makedirs(dirpath, exist_ok=True)
 
     @abc.abstractmethod
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         raise NotImplementedError
 
 
 class ScatterPlotVisualizationHook(VisualizationHookBase):
-    def __call__(self, model, dataloader, predictions, targets):
-        df = pd.DataFrame({"predictions": predictions.flatten(), "targets": targets.flatten()})
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
+        df = pd.DataFrame(
+            {"predictions": predictions.flatten(), "targets": targets.flatten()}
+        )
         df.sort_values("predictions", inplace=True)
 
         vmin = min(predictions.min(), targets.min()) - targets.std() / 10
@@ -94,8 +96,10 @@ class LiftChartVisualizationHook(VisualizationHookBase):
         super().__init__(dirpath, experiment_name, figsize)
         self.bins = bins
 
-    def __call__(self, model, dataloader, predictions, targets):
-        df = pd.DataFrame({"predictions": predictions.flatten(), "targets": targets.flatten()})
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
+        df = pd.DataFrame(
+            {"predictions": predictions.flatten(), "targets": targets.flatten()}
+        )
         df.sort_values("predictions", inplace=True)
 
         chunk_size = np.ceil(len(df) / self.bins)
@@ -111,12 +115,14 @@ class LiftChartVisualizationHook(VisualizationHookBase):
 
 
 class HeatmapVisualizationHook(VisualizationHookBase):
-    def __init__(self, dirpath, experiment_name, figsize=(20, 20), classes=None, normalize=True):
+    def __init__(
+        self, dirpath, experiment_name, figsize=(20, 20), classes=None, normalize=True
+    ):
         super().__init__(dirpath, experiment_name, figsize)
         self.classes = classes
         self.normalize = normalize
 
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         plt.clf()
         # compute cofusion_matrix
         predictions = np.argmax(predictions, axis=1)
@@ -214,7 +220,7 @@ class GradCamVisualizationHook(VisualizationHookBase):
             axes[i // n_cols][i % n_cols].axis("off")
         plt.savefig(save_path)
 
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         cam_extractor = getattr(cams, self.method)(
             model, input_shape=self.input_shape, target_layer=self.target_layer
         )
@@ -266,7 +272,7 @@ class ShapTextVisualizationHook(VisualizationHookBase):
 
         os.makedirs(dirpath, exist_ok=True)
 
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         # choose images that will be visualized
         assert predictions.shape == targets.shape
         deviation = ((predictions - targets) ** 2).mean(axis=1)
@@ -287,7 +293,9 @@ class ShapTextVisualizationHook(VisualizationHookBase):
                 if len(x) == 1:
                     inputs[key] = x[0][key].unsqueeze(0).cuda()
                 else:
-                    inputs[key] = torch.cat([v[key].unsqueeze(0).cuda() for v in x], dim=0)
+                    inputs[key] = torch.cat(
+                        [v[key].unsqueeze(0).cuda() for v in x], dim=0
+                    )
             outputs = model(**inputs).detach().cpu().numpy()
             return outputs
 
@@ -322,7 +330,7 @@ class RawSampleVisualizationHook(VisualizationHookBase):
         self.num_plots = num_plots
         self.select_top_predictions = select_top_predictions
 
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         # choose images that will be visualized
         assert predictions.shape == targets.shape
         deviation = ((predictions - targets) ** 2).mean(axis=1)

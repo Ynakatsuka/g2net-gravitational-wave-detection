@@ -7,7 +7,7 @@ import kvt.registry
 import lightly
 import torch
 import torch.nn as nn
-from kvt.models.layers import MixLinear
+from kvt.models.layers import Identity, MixLinear
 from kvt.registry import BACKBONES, MODELS
 from kvt.utils import (
     analyze_in_features,
@@ -15,6 +15,18 @@ from kvt.utils import (
     replace_last_linear,
     update_input_layer,
 )
+
+
+def disable_bn(model):
+    for name, layer in model.named_children():
+        if (
+            isinstance(layer, nn.BatchNorm1d)
+            or isinstance(layer, nn.BatchNorm2d)
+            or isinstance(layer, nn.BatchNorm3d)
+            or isinstance(layer, nn.SyncBatchNorm)
+        ):
+            setattr(getattr(model, name), Identity())
+        return model
 
 
 class ModelBuilderHookBase(object):
@@ -47,6 +59,11 @@ class DefaultModelBuilderHook(ModelBuilderHookBase):
         # sound event detection models and others
         else:
             model = self.build_backbone_wrapping_model(config)
+
+        # disable bn
+        if hasattr(config, "disable_bn") and config.disable_bn:
+            print("[Replace BatchNorm to Identity]")
+            model = disable_bn(model)
 
         # load pretrained model trained on external data
         if hasattr(config.params, "pretrained") and isinstance(

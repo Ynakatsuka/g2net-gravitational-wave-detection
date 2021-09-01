@@ -31,6 +31,7 @@ class BaseDataset(torch.utils.data.Dataset):
         predictions_dirname_for_pseudo_labeling=None,
         test_csv_filename=None,
         test_images_dir=None,
+        label_confidence_threshold=None,
         **params,
     ):
         self.input_column = input_column
@@ -52,13 +53,25 @@ class BaseDataset(torch.utils.data.Dataset):
         else:
             df = pd.read_csv(os.path.join(input_dir, csv_filename))
 
+        # TODO: make code clean
         if predictions_dirname_for_pseudo_labeling is not None:
             # load
             df_pl = pd.read_csv(os.path.join(input_dir, test_csv_filename))
-            load_test_paths = sorted(glob.glob(f"{predictions_dirname_for_pseudo_labeling}/*.npy"))
+            load_test_paths = sorted(
+                glob.glob(f"{predictions_dirname_for_pseudo_labeling}/*.npy")
+            )
             print(f"[predictions for pseudo labeling] {load_test_paths}")
             assert len(load_test_paths) == num_fold
-            df_pl[target_column] = np.mean([np.load(path) for path in load_test_paths], axis=0)
+            df_pl[target_column] = np.mean(
+                [np.load(path) for path in load_test_paths], axis=0
+            )
+
+            if label_confidence_threshold is not None:
+                mask = df_pl[target_column].between(
+                    label_confidence_threshold, 1 - label_confidence_threshold
+                )
+                # df_pl = df_pl[mask].reset_index(drop=True)
+                df_pl = df_pl[~mask].reset_index(drop=True)
 
             # concat
             df["__is_test__"], df_pl["__is_test__"] = False, True
@@ -106,7 +119,9 @@ class BaseDataset(torch.utils.data.Dataset):
         if self.test_images_dir is not None:
             is_test = df["__is_test__"]
             test_inputs = df[self.input_column].apply(
-                lambda x: os.path.join(self.input_dir, self.test_images_dir, x + self.extension)
+                lambda x: os.path.join(
+                    self.input_dir, self.test_images_dir, x + self.extension
+                )
             )
             inputs[is_test] = test_inputs[is_test]
 

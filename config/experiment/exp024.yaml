@@ -1,0 +1,24 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=default
+
+defaults:
+  - override /augmentation: default
+  - override /competition: default
+  - override /dataset: default
+  - override /fold: default
+  - override /hook: default
+  - override /lightning_module: default
+  - override /model: default
+  - override /optimizer: default
+  - override /trainer: default
+#
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+model:
+  loss:
+    name: "OUSMLoss"
+    loss: "BCEWithLogitsLoss"
+    ousm: True
+    k: 1

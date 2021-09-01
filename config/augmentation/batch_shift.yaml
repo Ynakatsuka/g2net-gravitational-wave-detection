@@ -25,6 +25,8 @@ batch_transform:
         mode: "per_channel"
         sample_rate: 2048
         p: 0.5
+        min_shift: -0.001
+        max_shift: 0.001
   validation:
 
   test:

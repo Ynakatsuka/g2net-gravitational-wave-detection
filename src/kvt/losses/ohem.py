@@ -4,7 +4,11 @@ import torch.nn.functional as F
 
 
 def onehot_encoding(label, n_classes):
-    return torch.zeros(label.size(0), n_classes).to(label.device).scatter_(1, label.view(-1, 1), 1)
+    return (
+        torch.zeros(label.size(0), n_classes)
+        .to(label.device)
+        .scatter_(1, label.view(-1, 1), 1)
+    )
 
 
 def oh_cross_entropy_loss(input, target, reduction):
@@ -60,7 +64,9 @@ class OHEMLoss(nn.Module):
 
 
 class OHEMLossWithLogits(nn.Module):
-    def __init__(self, rate=0.7, loss=None, weight=None, params={}, smoothing_eps=0):
+    def __init__(
+        self, rate=0.7, loss=None, weight=None, params={}, smoothing_eps=0,
+    ):
         super().__init__()
         self.rate = rate
         self.smoothing_eps = smoothing_eps
@@ -91,6 +97,7 @@ class OHEMLossWithLogits(nn.Module):
                 ohem_cls_loss = F.cross_entropy(pred, target.long(), reduction="none")
 
         sorted_ohem_loss, idx = torch.sort(ohem_cls_loss, descending=True)
+
         keep_num = min(sorted_ohem_loss.size()[0], int(batch_size * self.rate))
         if keep_num < sorted_ohem_loss.size()[0]:
             keep_idx_cuda = idx[:keep_num]

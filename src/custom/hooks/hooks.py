@@ -1,15 +1,18 @@
+import glob
+
+import kvt
+import kvt.hooks
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import torch
+from kvt.hooks import VisualizationHookBase
 from PIL import Image
+from sklearn.metrics import roc_auc_score
 from torchcam import cams
 from torchcam.cams import locate_candidate_layer
 from torchcam.utils import overlay_mask
 from torchvision.transforms.functional import to_pil_image
-
-import kvt
-import kvt.hooks
-from kvt.hooks import VisualizationHookBase
 
 
 def make_subset_dataloader(dataloader, indices, batch_size):
@@ -88,7 +91,7 @@ class G2NetGradCamVisualizationHook(VisualizationHookBase):
 
         plt.savefig(save_path)
 
-    def __call__(self, model, dataloader, predictions, targets):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
         if self.target_layer is None:
             self.target_layer = "backbone." + locate_candidate_layer(model.backbone)
             print("[Target Layer of CAM] ", self.target_layer)
@@ -120,3 +123,29 @@ class G2NetGradCamVisualizationHook(VisualizationHookBase):
         )
 
         return self.result
+
+
+@kvt.HOOKS.register
+class HardSampleROCAUCVisualizationHook(VisualizationHookBase):
+    def __call__(self, model, dataloader, predictions, targets, logger=None):
+        threshold = 0.01
+
+        fold_id = dataloader.dataset.idx_fold
+
+        path = sorted(glob.glob("../data/output/predictions/oof/default/*.npy"))[
+            fold_id
+        ]
+        base_predictions = np.load(path)
+
+        deviation = np.abs(base_predictions - targets)
+        idx = deviation > threshold
+
+        score = roc_auc_score(targets[idx], predictions[idx])
+
+        if logger is not None:
+            logger.log_metrics({"val_hard_roc": score})
+        else:
+            print(f"val_hard_roc: {score}")
+
+        return self.result
+

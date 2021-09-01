@@ -8,7 +8,7 @@ defaults:
   - override /competition: default
   - override /dataset: default
   - override /fold: default
-  - override /hook: default
+  - override /hook: simple
   - override /lightning_module: default
   - override /model: default
   - override /optimizer: default
@@ -24,6 +24,7 @@ trainer:
   trainer:
     max_epochs: 5
     val_check_interval: 0.2
+    # resume_from_checkpoint: "${save_dir}/models/${experiment_name}/fold_${trainer.idx_fold}_best.ckpt"
 
 optimizer:
   optimizer:

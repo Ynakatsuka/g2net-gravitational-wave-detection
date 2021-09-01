@@ -1,0 +1,50 @@
+model:
+  name: "G2Net"
+  params:
+    num_classes: 1
+    backbone:
+      name: "tf_efficientnet_b0_ns"
+      params:
+        in_chans: 3
+        pretrained: True
+    spectrogram_method: "CQT" # STFT, CQT
+    hop_length: 32
+    bins_per_octave: 8
+    sample_rate: 2048
+    fmin: 10
+    fmax: 1024
+    window: "hann"
+    use_spec_augmentation: False
+    time_drop_width: 8
+    time_stripes_num: 2
+    freq_drop_width: 8
+    freq_stripes_num: 2
+    spec_augmentation_method: "cm"
+    apply_tta: False
+    apply_mixup: False
+    apply_spec_shuffle: False
+    spec_shuffle_prob: 0
+  last_linear:
+    replace: True
+    params:
+      # dropout_rate: 0.
+      pool_type: "gem"
+      # use_seblock: False
+      # use_multisample_dropout: True
+      # multi_sample_dropout_p: 0.2
+      # n_multi_samples: 5
+
+loss:
+  name: "FloodingBCEWithLogitsLoss"
+  params:
+    b: 0.01
+
+metrics:
+  roc:
+    name: "sklearn_roc_auc_score"
+  pr:
+    name: "sklearn_precision_score"
+  rc:
+    name: "sklearn_recall_score"
+  # hard_roc:
+  # name: "hard_sample_roc_auc_score"

@@ -1,0 +1,28 @@
+dataset:
+  - name: "G2NetImageDataset"
+    params:
+      csv_filename: ${fold.csv_filename}
+      input_column: "id"
+      target_column: ${competition.target_column}
+      target_unique_values: ${competition.target_unique_values}
+      input_dir: ${save_dir}/preprocess_v000
+      extension: ".npy"
+      num_fold: 5
+      idx_fold: ${trainer.idx_fold}
+      csv_input_dir: ${save_dir}
+    splits:
+      - split: "train"
+      - split: "validation"
+  - name: "G2NetImageDataset"
+    params:
+      csv_filename: "sample_submission.csv"
+      input_column: "id"
+      input_dir: ${save_dir}/preprocess_v000
+      extension: ".npy"
+      csv_input_dir: ${input_dir}
+    splits:
+      - split: "test"
+
+transform:
+  name: "base_image_transform"
+  num_preprocessor: 24
