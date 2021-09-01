@@ -24,3 +24,4 @@ torch-audiomentations>=0.8.0
 scipy>=1.7.1
 feets>=0.4
 nolds>=0.5.2
+pysen[lint]>=0.9.0
