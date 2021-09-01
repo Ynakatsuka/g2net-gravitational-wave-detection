@@ -40,15 +40,14 @@ class DinoCollateFunction(nn.Module):
         flip_and_color_jitter = T.Compose(
             [
                 T.RandomHorizontalFlip(p=hf_prob),
-                T.RandomApply([T.ColorJitter(cj_bright, cj_contrast, cj_sat, cj_hue)], p=cj_prob),
+                T.RandomApply(
+                    [T.ColorJitter(cj_bright, cj_contrast, cj_sat, cj_hue)], p=cj_prob
+                ),
                 T.RandomGrayscale(p=random_gray_scale),
             ]
         )
         normalize = T.Compose(
-            [
-                T.ToTensor(),
-                T.Normalize(mean=normalize["mean"], std=normalize["std"]),
-            ]
+            [T.ToTensor(), T.Normalize(mean=normalize["mean"], std=normalize["std"]),]
         )
 
         # first global crop

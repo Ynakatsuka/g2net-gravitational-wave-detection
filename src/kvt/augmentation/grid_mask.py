@@ -31,7 +31,9 @@ class GridMask(DualTransform):
     |  https://github.com/akuxcw/GridMask
     """
 
-    def __init__(self, num_grid=3, fill_value=0, rotate=0, mode=0, always_apply=False, p=0.5):
+    def __init__(
+        self, num_grid=3, fill_value=0, rotate=0, mode=0, always_apply=False, p=0.5
+    ):
         super(GridMask, self).__init__(always_apply, p)
         if isinstance(num_grid, int):
             num_grid = (num_grid, num_grid)
@@ -48,13 +50,12 @@ class GridMask(DualTransform):
     def init_masks(self, height, width):
         if self.masks is None:
             self.masks = []
-            n_masks = self.num_grid[1] - self.num_grid[0] + 1
             for n, n_g in enumerate(range(self.num_grid[0], self.num_grid[1] + 1, 1)):
                 grid_h = height / n_g
                 grid_w = width / n_g
-                this_mask = np.ones((int((n_g + 1) * grid_h), int((n_g + 1) * grid_w))).astype(
-                    np.uint8
-                )
+                this_mask = np.ones(
+                    (int((n_g + 1) * grid_h), int((n_g + 1) * grid_w))
+                ).astype(np.uint8)
                 for i in range(n_g + 1):
                     for j in range(n_g + 1):
                         this_mask[
@@ -90,7 +91,11 @@ class GridMask(DualTransform):
         mask = self.masks[mid]
         rand_h = np.random.randint(self.rand_h_max[mid])
         rand_w = np.random.randint(self.rand_w_max[mid])
-        angle = np.random.randint(self.rotate[0], self.rotate[1]) if self.rotate[1] > 0 else 0
+        angle = (
+            np.random.randint(self.rotate[0], self.rotate[1])
+            if self.rotate[1] > 0
+            else 0
+        )
 
         return {"mask": mask, "rand_h": rand_h, "rand_w": rand_w, "angle": angle}
 

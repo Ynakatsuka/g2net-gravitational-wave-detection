@@ -1,12 +1,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from transformers import (AutoConfig, AutoModel, AutoModelForMaskedLM,
-                          AutoModelForSequenceClassification)
-
 from kvt.models.heads import MultiSampleDropout
 from kvt.models.layers import SEBlock
 from kvt.models.necks import gem1d
+from transformers import (
+    AutoConfig,
+    AutoModel,
+    AutoModelForMaskedLM,
+    AutoModelForSequenceClassification,
+)
 
 
 class FirstTokenPool(nn.Module):
@@ -133,7 +136,9 @@ class CustomTransformersForSequenceClassification(nn.Module):
                 )
             )
         else:
-            last_layers.extend([nn.Dropout(dropout_rate), nn.Linear(hidden_size, num_classes)])
+            last_layers.extend(
+                [nn.Dropout(dropout_rate), nn.Linear(hidden_size, num_classes)]
+            )
         self.fc = nn.Sequential(*last_layers)
         self._init_weights(self.fc)
 
@@ -194,16 +199,22 @@ class CustomTransformersForSequenceClassification(nn.Module):
             pooler_output = encoder_output["pooler_output"]
         else:
             if self.n_collect_hidden_states is not None:
-                hidden_layers = encoder_output["hidden_states"][-self.n_collect_hidden_states :]
+                hidden_layers = encoder_output["hidden_states"][
+                    -self.n_collect_hidden_states :
+                ]
                 hidden_states = torch.cat(
                     hidden_layers, dim=-1
                 )  # -> [bs, max_length, hidden_states * n_collect_hidden_states]
-                hidden_states = hidden_states.transpose(1, 2)  # -> [bs, hidden_states, max_length]
+                hidden_states = hidden_states.transpose(
+                    1, 2
+                )  # -> [bs, hidden_states, max_length]
             else:
                 hidden_states = encoder_output[
                     "last_hidden_state"
                 ]  # -> [bs, max_length, hidden_states]
-                hidden_states = hidden_states.transpose(1, 2)  # -> [bs, hidden_states, max_length]
+                hidden_states = hidden_states.transpose(
+                    1, 2
+                )  # -> [bs, hidden_states, max_length]
 
             if isinstance(self.bert_pooling, nn.ModuleList):
                 pooler_output = torch.cat(
@@ -211,7 +222,9 @@ class CustomTransformersForSequenceClassification(nn.Module):
                     dim=-1,
                 )  # -> [bs, hidden_states*len(pooler_name)]
             else:
-                pooler_output = self.bert_pooling(hidden_states)  # -> [bs, hidden_states]
+                pooler_output = self.bert_pooling(
+                    hidden_states
+                )  # -> [bs, hidden_states]
 
         output = self.fc(pooler_output)  # -> [bs, num_classes]
         return output

@@ -84,9 +84,13 @@ class SM3(Optimizer):
                         return constructor(grad_indices, values, grad.size())
 
                     acc = state[_key(0)]
-                    update_values = _compute_sparse_update(beta, acc, grad_values, grad_indices)
+                    update_values = _compute_sparse_update(
+                        beta, acc, grad_values, grad_indices
+                    )
 
-                    self._update_sparse_accumulator(beta, acc, make_sparse(update_values))
+                    self._update_sparse_accumulator(
+                        beta, acc, make_sparse(update_values)
+                    )
 
                     # Add small amount for numerical stability
                     update_values.add_(eps).rsqrt_().mul_(grad_values)

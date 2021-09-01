@@ -1,8 +1,7 @@
 import albumentations as albu
-import numpy as np
-
 import kvt
 import kvt.augmentation
+import numpy as np
 
 try:
     import audiomentations as audi

@@ -41,7 +41,9 @@ class BaseSSLScorer:
 
 
 class BaseSSLCVScorer:
-    def __init__(self, n_splits=5, random_state=42, apply_normalize=True, n_jobs=5, **kwargs):
+    def __init__(
+        self, n_splits=5, random_state=42, apply_normalize=True, n_jobs=5, **kwargs
+    ):
         self.n_splits = n_splits
         self.random_state = random_state
         self.model_kwargs = kwargs

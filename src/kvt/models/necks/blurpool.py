@@ -28,11 +28,7 @@ class BlurPool(nn.Module):
         self.channels = channels
 
         if self.filt_size == 1:
-            a = np.array(
-                [
-                    1.0,
-                ]
-            )
+            a = np.array([1.0,])
         elif self.filt_size == 2:
             a = np.array([1.0, 1.0])
         elif self.filt_size == 3:
@@ -48,7 +44,9 @@ class BlurPool(nn.Module):
 
         filt = torch.Tensor(a[:, None] * a[None, :])
         filt = filt / torch.sum(filt)
-        self.register_buffer("filt", filt[None, None, :, :].repeat((self.channels, 1, 1, 1)))
+        self.register_buffer(
+            "filt", filt[None, None, :, :].repeat((self.channels, 1, 1, 1))
+        )
 
         self.pad = get_pad_layer(pad_type)(self.pad_sizes)
 
@@ -59,7 +57,9 @@ class BlurPool(nn.Module):
             else:
                 return self.pad(inp)[:, :, :: self.stride, :: self.stride]
         else:
-            return F.conv2d(self.pad(inp), self.filt, stride=self.stride, groups=inp.shape[1])
+            return F.conv2d(
+                self.pad(inp), self.filt, stride=self.stride, groups=inp.shape[1]
+            )
 
 
 def get_pad_layer(pad_type):
@@ -79,7 +79,10 @@ class BlurPool1D(nn.Module):
         super(BlurPool1D, self).__init__()
         self.filt_size = filt_size
         self.pad_off = pad_off
-        self.pad_sizes = [int(1.0 * (filt_size - 1) / 2), int(np.ceil(1.0 * (filt_size - 1) / 2))]
+        self.pad_sizes = [
+            int(1.0 * (filt_size - 1) / 2),
+            int(np.ceil(1.0 * (filt_size - 1) / 2)),
+        ]
         self.pad_sizes = [pad_size + pad_off for pad_size in self.pad_sizes]
         self.stride = stride
         self.off = int((self.stride - 1) / 2.0)
@@ -87,11 +90,7 @@ class BlurPool1D(nn.Module):
 
         # print('Filter size [%i]' % filt_size)
         if self.filt_size == 1:
-            a = np.array(
-                [
-                    1.0,
-                ]
-            )
+            a = np.array([1.0,])
         elif self.filt_size == 2:
             a = np.array([1.0, 1.0])
         elif self.filt_size == 3:
@@ -118,7 +117,9 @@ class BlurPool1D(nn.Module):
             else:
                 return self.pad(inp)[:, :, :: self.stride]
         else:
-            return F.conv1d(self.pad(inp), self.filt, stride=self.stride, groups=inp.shape[1])
+            return F.conv1d(
+                self.pad(inp), self.filt, stride=self.stride, groups=inp.shape[1]
+            )
 
 
 def get_pad_layer_1d(pad_type):

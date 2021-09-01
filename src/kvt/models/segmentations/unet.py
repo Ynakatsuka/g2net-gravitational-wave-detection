@@ -13,7 +13,9 @@ class Conv3x3GNReLU(nn.Module):
             num_groups = out_channels // 2
 
         self.blocks = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
+            ),
             nn.GroupNorm(num_groups, out_channels),
             nn.ReLU(inplace=True),
         )
@@ -49,7 +51,12 @@ class DecoderBlock(nn.Module):
 
 class Decoder(nn.Module):
     def __init__(
-        self, num_classes, encoder_channels, dropout=0.2, out_channels=[256, 128, 64, 32, 16], **_
+        self,
+        num_classes,
+        encoder_channels,
+        dropout=0.2,
+        out_channels=[256, 128, 64, 32, 16],
+        **_,
     ):
         super().__init__()
         in_channels = encoder_channels
@@ -108,7 +115,7 @@ class DecoderWithClassificationHead(nn.Module):
         dropout=0.2,
         out_channels=[256, 128, 64, 32, 16],
         use_cls_head=False,
-        **_
+        **_,
     ):
         super().__init__()
         in_channels = encoder_channels

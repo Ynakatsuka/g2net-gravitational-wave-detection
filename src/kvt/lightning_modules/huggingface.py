@@ -10,7 +10,7 @@ class LightningModuleMLM(LightningModuleBase):
         scheduler=None,
         hooks=None,
         max_epochs=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.model = model

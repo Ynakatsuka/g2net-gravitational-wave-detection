@@ -2,6 +2,7 @@
 
 import torch
 import torch.nn.functional as F
+from torch import einsum, nn
 
 try:
     from einops import rearrange
@@ -9,7 +10,6 @@ try:
 except:
     rearrange = None
     Rearrange = None
-from torch import einsum, nn
 
 # helper functions
 
@@ -123,7 +123,9 @@ class Attention(nn.Module):
             context_mask = (
                 default(context_mask, mask)
                 if not has_context
-                else default(context_mask, lambda: torch.ones(*context.shape[:2], device=device))
+                else default(
+                    context_mask, lambda: torch.ones(*context.shape[:2], device=device)
+                )
             )
             mask_value = -torch.finfo(dots.dtype).max
             mask = rearrange(mask, "b i -> b () i ()") * rearrange(
@@ -155,7 +157,9 @@ class FeedForward(nn.Module):
 
 
 class ConformerConvModule(nn.Module):
-    def __init__(self, dim, causal=False, expansion_factor=2, kernel_size=31, dropout=0.0):
+    def __init__(
+        self, dim, causal=False, expansion_factor=2, kernel_size=31, dropout=0.0
+    ):
         super().__init__()
 
         inner_dim = dim * expansion_factor
@@ -166,7 +170,9 @@ class ConformerConvModule(nn.Module):
             Rearrange("b n c -> b c n"),
             nn.Conv1d(dim, inner_dim * 2, 1),
             GLU(dim=1),
-            DepthWiseConv1d(inner_dim, inner_dim, kernel_size=kernel_size, padding=padding),
+            DepthWiseConv1d(
+                inner_dim, inner_dim, kernel_size=kernel_size, padding=padding
+            ),
             nn.BatchNorm1d(inner_dim) if not causal else nn.Identity(),
             Swish(),
             nn.Conv1d(inner_dim, dim, 1),
@@ -193,11 +199,13 @@ class ConformerBlock(nn.Module):
         conv_kernel_size=31,
         attn_dropout=0.0,
         ff_dropout=0.0,
-        conv_dropout=0.0
+        conv_dropout=0.0,
     ):
         super().__init__()
         self.ff1 = FeedForward(dim=dim, mult=ff_mult, dropout=ff_dropout)
-        self.attn = Attention(dim=dim, dim_head=dim_head, heads=heads, dropout=attn_dropout)
+        self.attn = Attention(
+            dim=dim, dim_head=dim_head, heads=heads, dropout=attn_dropout
+        )
         self.conv = ConformerConvModule(
             dim=dim,
             causal=False,

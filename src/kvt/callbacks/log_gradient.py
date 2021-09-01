@@ -18,7 +18,9 @@ def filter_layers_to_check_gradients(model, max_layers):
         unique_layer_names = set()
         for name in layer_names:
             split_names = name.split(".")
-            unique_layer_names.add(".".join(split_names[: max(-i, 1 - len(split_names))]))
+            unique_layer_names.add(
+                ".".join(split_names[: max(-i, 1 - len(split_names))])
+            )
         i += 1
 
         # squueze
@@ -31,12 +33,18 @@ def filter_layers_to_check_gradients(model, max_layers):
 
 
 def aggregate_gradient_norms(model, max_layers=50):
-    layers_to_check_gradients = filter_layers_to_check_gradients(model, max_layers=max_layers)
+    layers_to_check_gradients = filter_layers_to_check_gradients(
+        model, max_layers=max_layers
+    )
 
     gradient_norms = {name: [] for name in layers_to_check_gradients}
     for name, param in model.named_parameters():
         for check_name in layers_to_check_gradients:
-            if name.startswith(check_name) and param.requires_grad and (param.grad is not None):
+            if (
+                name.startswith(check_name)
+                and param.requires_grad
+                and (param.grad is not None)
+            ):
                 gradient_norms[check_name].append(param.grad.norm(2))
     gradient_norms = {k: torch.stack(v).mean() for k, v in gradient_norms.items()}
     return gradient_norms

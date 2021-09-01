@@ -25,7 +25,9 @@ class DINOLoss(nn.Module):
         # a too high temperature makes the training instable at the beginning
         self.teacher_temp_schedule = np.concatenate(
             (
-                np.linspace(warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs),
+                np.linspace(
+                    warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs
+                ),
                 np.ones(nepochs - warmup_teacher_temp_epochs) * teacher_temp,
             )
         )
@@ -61,7 +63,9 @@ class DINOLoss(nn.Module):
         """
         Update center used for teacher output.
         """
-        batch_center = torch.sum(teacher_output, dim=0, keepdim=True) / len(teacher_output)
+        batch_center = torch.sum(teacher_output, dim=0, keepdim=True) / len(
+            teacher_output
+        )
 
         # ema update
         self.center = self.center * self.center_momentum + batch_center * (
@@ -92,7 +96,9 @@ class DDINOLoss(nn.Module):
         # a too high temperature makes the training instable at the beginning
         self.teacher_temp_schedule = np.concatenate(
             (
-                np.linspace(warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs),
+                np.linspace(
+                    warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs
+                ),
                 np.ones(nepochs - warmup_teacher_temp_epochs) * teacher_temp,
             )
         )
@@ -188,7 +194,9 @@ class DDINOLoss(nn.Module):
         """
 
         # view level center update
-        batch_center = torch.sum(teacher_output, dim=0, keepdim=True) / len(teacher_output)
+        batch_center = torch.sum(teacher_output, dim=0, keepdim=True) / len(
+            teacher_output
+        )
 
         # region level center update
         batch_grid_center = torch.sum(teacher_grid_output, dim=0, keepdim=True) / len(
@@ -199,6 +207,7 @@ class DDINOLoss(nn.Module):
         self.center = self.center * self.center_momentum + batch_center * (
             1 - self.center_momentum
         )
-        self.center_grid = self.center_grid * self.center_momentum + batch_grid_center * (
-            1 - self.center_momentum
+        self.center_grid = (
+            self.center_grid * self.center_momentum
+            + batch_grid_center * (1 - self.center_momentum)
         )

@@ -66,7 +66,10 @@ class BinaryFocalLoss(nn.Module):
         max_val = (-input).clamp(min=0)
 
         loss = (
-            input - input * target + max_val + ((-max_val).exp() + (-input - max_val).exp()).log()
+            input
+            - input * target
+            + max_val
+            + ((-max_val).exp() + (-input - max_val).exp()).log()
         )
         invprobs = F.logsigmoid(-input * (target * 2 - 1))
         loss = (invprobs * self.gamma).exp() * loss
@@ -106,7 +109,10 @@ class BinaryReducedFocalLoss(nn.Module):
         max_val = (-input).clamp(min=0)
 
         loss = (
-            input - input * target + max_val + ((-max_val).exp() + (-input - max_val).exp()).log()
+            input
+            - input * target
+            + max_val
+            + ((-max_val).exp() + (-input - max_val).exp()).log()
         )
         invprobs = F.logsigmoid(-input * (target * 2 - 1))
         invprobs = torch.where(
@@ -151,7 +157,10 @@ class LabelSmoothBinaryFocalLoss(nn.Module):
         max_val = (-input).clamp(min=0)
 
         loss = (
-            input - input * target + max_val + ((-max_val).exp() + (-input - max_val).exp()).log()
+            input
+            - input * target
+            + max_val
+            + ((-max_val).exp() + (-input - max_val).exp()).log()
         )
         invprobs = F.logsigmoid(-input * (target * 2 - 1))
         loss = (invprobs * self.gamma).exp() * loss

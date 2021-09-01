@@ -10,4 +10,3 @@ class FloodingBCEWithLogitsLoss(nn.Module):
 
     def forward(self, input, target):
         return torch.abs(self.loss(input, target) - self.b) + self.b
-

@@ -58,8 +58,12 @@ class CWT(nn.Module):
 
         for ind, width in enumerate(self.widths):
             N = np.min([10 * width, x.shape[-1]])
-            wavelet_data = torch.conj(torch.flip(self.wavelet(N, width, dtype, device), [-1]))
-            wavelet_data = torch.broadcast_to(wavelet_data, (ch, ch, wavelet_data.shape[0]))
+            wavelet_data = torch.conj(
+                torch.flip(self.wavelet(N, width, dtype, device), [-1])
+            )
+            wavelet_data = torch.broadcast_to(
+                wavelet_data, (ch, ch, wavelet_data.shape[0])
+            )
 
             c = F.conv1d(x, wavelet_data, padding="same")
             output.append(c)

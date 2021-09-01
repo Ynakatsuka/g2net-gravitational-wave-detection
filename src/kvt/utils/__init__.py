@@ -1,13 +1,25 @@
-from .checkpoint import (fix_dp_model_state_dict, fix_transformers_state_dict,
-                         load_state_dict_on_same_size)
+from .checkpoint import (
+    fix_dp_model_state_dict,
+    fix_transformers_state_dict,
+    load_state_dict_on_same_size,
+)
 from .fold import MultilabelStratifiedGroupKFold, StratifiedGroupKFold
-from .initialize import (initialize_model, initialize_transformer_models,
-                         reinitialize_model)
+from .initialize import (
+    initialize_model,
+    initialize_transformer_models,
+    reinitialize_model,
+)
 from .kaggle import is_kaggle_kernel, monitor_submission_time, upload_dataset
 from .layer import analyze_in_features, replace_last_linear, update_input_layer
 from .registry import Registry, build_from_config
-from .utils import (check_attr, concatenate, save_predictions, seed_torch,
-                    trace, update_experiment_name)
+from .utils import (
+    check_attr,
+    concatenate,
+    save_predictions,
+    seed_torch,
+    trace,
+    update_experiment_name,
+)
 
 __all__ = [
     "Registry",

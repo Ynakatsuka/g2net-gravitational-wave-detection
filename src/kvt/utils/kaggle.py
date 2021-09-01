@@ -37,9 +37,7 @@ def upload_dataset(title, dirname, user_id, dir_mode="zip"):
         str(d) for d in api.dataset_list(user=user_id, search=f'"{title}"')
     ]:
         api.dataset_create_new(
-            folder=dirname,
-            convert_to_csv=False,
-            dir_mode=dir_mode,
+            folder=dirname, convert_to_csv=False, dir_mode=dir_mode,
         )
     else:
         api.dataset_create_version(

@@ -20,7 +20,9 @@ class SegmentationWithClassificationHeadLoss:
 
         assert self.loss_cls is not None
 
-        loss_cls = self.loss_cls(input=outputs["cls_logits"], target=labels["cls_labels"])
+        loss_cls = self.loss_cls(
+            input=outputs["cls_logits"], target=labels["cls_labels"]
+        )
 
         logits = outputs["logits"]
         logits = logits * cls_tp

@@ -37,8 +37,7 @@ class MultiCropWrapper(nn.Module):
             x = [x]
         idx_crops = torch.cumsum(
             torch.unique_consecutive(
-                torch.tensor([inp.shape[-1] for inp in x]),
-                return_counts=True,
+                torch.tensor([inp.shape[-1] for inp in x]), return_counts=True,
             )[1],
             0,
         )

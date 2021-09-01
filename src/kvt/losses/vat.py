@@ -58,7 +58,9 @@ class VATLoss(nn.Module):
                 d.requires_grad_()
                 pred_hat = model(x + self.xi * d)
                 logp_hat = self.log_link_func(pred_hat, dim=1)
-                adv_distance = F.kl_div(logp_hat, pred, reduction="batchmean", log_target=False)
+                adv_distance = F.kl_div(
+                    logp_hat, pred, reduction="batchmean", log_target=False
+                )
                 adv_distance.backward()
                 d = _l2_normalize(d.grad)
                 model.zero_grad()

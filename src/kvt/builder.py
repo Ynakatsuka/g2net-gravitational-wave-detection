@@ -1,16 +1,12 @@
 from functools import partial
 
 import hydra
+import kvt
+import kvt.augmentation
 import torch.nn as nn
 import torch_optimizer as optim
 import torchvision.transforms as T
 from easydict import EasyDict as edict
-from omegaconf import OmegaConf
-from pytorch_lightning.plugins import DDPPlugin
-from torch.utils.data import DataLoader
-
-import kvt
-import kvt.augmentation
 from kvt.registry import (
     CALLBACKS,
     COLLATE_FNS,
@@ -25,6 +21,9 @@ from kvt.registry import (
     TRANSFORMS,
 )
 from kvt.utils import build_from_config
+from omegaconf import OmegaConf
+from pytorch_lightning.plugins import DDPPlugin
+from torch.utils.data import DataLoader
 
 
 def build_collate_fn(config, dataset, split, **kwargs):

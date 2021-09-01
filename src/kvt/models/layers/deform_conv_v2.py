@@ -4,7 +4,9 @@ from torch import nn
 
 
 class DeformConv2d(nn.Module):
-    def __init__(self, inc, outc, kernel_size=3, padding=1, stride=1, bias=None, modulation=False):
+    def __init__(
+        self, inc, outc, kernel_size=3, padding=1, stride=1, bias=None, modulation=False
+    ):
         """
         Args:
             modulation (bool, optional): If True, Modulated Defomable Convolution (Deformable ConvNets v2).
@@ -14,7 +16,9 @@ class DeformConv2d(nn.Module):
         self.padding = padding
         self.stride = stride
         self.zero_padding = nn.ZeroPad2d(padding)
-        self.conv = nn.Conv2d(inc, outc, kernel_size=kernel_size, stride=kernel_size, bias=bias)
+        self.conv = nn.Conv2d(
+            inc, outc, kernel_size=kernel_size, stride=kernel_size, bias=bias
+        )
 
         self.p_conv = nn.Conv2d(
             inc, 2 * kernel_size * kernel_size, kernel_size=3, padding=1, stride=stride
@@ -74,7 +78,10 @@ class DeformConv2d(nn.Module):
 
         # clip p
         p = torch.cat(
-            [torch.clamp(p[..., :N], 0, x.size(2) - 1), torch.clamp(p[..., N:], 0, x.size(3) - 1)],
+            [
+                torch.clamp(p[..., :N], 0, x.size(2) - 1),
+                torch.clamp(p[..., N:], 0, x.size(3) - 1),
+            ],
             dim=-1,
         )
 

@@ -217,4 +217,3 @@ def run(config):
         lightning_module.run_visualization(
             predictions, targets, dataloaders["validation"]
         )
-

@@ -12,6 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 from .focal import BinaryFocalLoss
 
+
 """
 Basic loss definition
 """

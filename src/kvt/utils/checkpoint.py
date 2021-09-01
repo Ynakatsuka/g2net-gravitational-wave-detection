@@ -75,7 +75,9 @@ def load_state_dict_on_same_size(model, state_dict, threshold=0.5, infer_key=Fal
     if load_ratio < threshold:
         if infer_key:
             state_dict = fix_state_dict_shallow(state_dict)
-            return load_state_dict_on_same_size(model, state_dict, threshold, infer_key=False)
+            return load_state_dict_on_same_size(
+                model, state_dict, threshold, infer_key=False
+            )
         else:
             print(f"[Loading weights] {load_count} / {overall_count}")
             print("State dict keys: ", state_dict.keys())

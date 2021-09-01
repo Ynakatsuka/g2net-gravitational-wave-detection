@@ -1,17 +1,21 @@
+import kvt.models
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchaudio
+from kvt.augmentation import SpecAugmentationPlusPlus
+from kvt.models.layers import AttBlockV2
 from torchlibrosa.augmentation import SpecAugmentation
 from torchlibrosa.stft import LogmelFilterBank, Spectrogram
 
-import kvt.models
-from kvt.augmentation import SpecAugmentationPlusPlus
-from kvt.models.layers import AttBlockV2
-
-from .audio_features import (Loudness, PCENTransform, add_frequency_encoding,
-                             add_time_encoding, make_delta)
+from .audio_features import (
+    Loudness,
+    PCENTransform,
+    add_frequency_encoding,
+    add_time_encoding,
+    make_delta,
+)
 from .conformer import ConformerBlock
 
 
@@ -167,18 +171,14 @@ class SED(nn.Module):
         if self.use_loudness:
             self.loudness_bn = nn.BatchNorm1d(1)
             self.loudness_extractor = Loudness(
-                sr=sample_rate,
-                n_fft=n_fft,
-                min_db=min_db,
+                sr=sample_rate, n_fft=n_fft, min_db=min_db,
             )
 
         if self.use_spectral_centroid:
             self.spectral_centroid_bn = nn.BatchNorm1d(1)
 
         if self.apply_pcen:
-            self.pcen_transform = PCENTransform(
-                trainable=~freeze_pcen_parameters,
-            )
+            self.pcen_transform = PCENTransform(trainable=~freeze_pcen_parameters,)
 
         self.bn0 = nn.BatchNorm2d(n_mels)
         self.backbone = backbone
@@ -421,18 +421,14 @@ class ImageSED(nn.Module):
         if self.use_loudness:
             self.loudness_bn = nn.BatchNorm1d(1)
             self.loudness_extractor = Loudness(
-                sr=sample_rate,
-                n_fft=n_fft,
-                min_db=min_db,
+                sr=sample_rate, n_fft=n_fft, min_db=min_db,
             )
 
         if self.use_spectral_centroid:
             self.spectral_centroid_bn = nn.BatchNorm1d(1)
 
         if self.apply_pcen:
-            self.pcen_transform = PCENTransform(
-                trainable=~freeze_pcen_parameters,
-            )
+            self.pcen_transform = PCENTransform(trainable=~freeze_pcen_parameters,)
 
         # layers = list(backbone.children())[:-2]
         # self.backbone = nn.Sequential(*layers)
@@ -638,8 +634,7 @@ class ConformerSED(nn.Module):
         )
 
         self.fc = nn.Sequential(
-            nn.Dropout(dropout_rate),
-            nn.Linear(n_mels, num_classes),
+            nn.Dropout(dropout_rate), nn.Linear(n_mels, num_classes),
         )
 
     def forward(self, input, mixup_lambda=None, mixup_index=None):

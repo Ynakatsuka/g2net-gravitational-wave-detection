@@ -286,7 +286,9 @@ class Contrast(A.ImageOnlyTransform):
     def apply(self, image, **params):
         factor = 1 + float_parameter(self.mag, 0.9, flip_sign=True)
         image = PIL.Image.fromarray(image, mode="RGB")
-        return np.asarray(PIL.ImageEnhance.Contrast(image).enhance(factor), dtype=np.uint8)
+        return np.asarray(
+            PIL.ImageEnhance.Contrast(image).enhance(factor), dtype=np.uint8
+        )
 
 
 class Color(A.ImageOnlyTransform):
@@ -312,7 +314,9 @@ class Brightness(A.ImageOnlyTransform):
     def apply(self, image, **params):
         factor = 1 + float_parameter(self.mag, 0.9, flip_sign=True)
         image = PIL.Image.fromarray(image, mode="RGB")
-        return np.asarray(PIL.ImageEnhance.Brightness(image).enhance(factor), dtype=np.uint8)
+        return np.asarray(
+            PIL.ImageEnhance.Brightness(image).enhance(factor), dtype=np.uint8
+        )
 
 
 class Sharpness(A.ImageOnlyTransform):
@@ -325,7 +329,9 @@ class Sharpness(A.ImageOnlyTransform):
     def apply(self, image, **params):
         factor = 1 + float_parameter(self.mag, 0.9, flip_sign=True)
         image = PIL.Image.fromarray(image, mode="RGB")
-        return np.asarray(PIL.ImageEnhance.Sharpness(image).enhance(factor), dtype=np.uint8)
+        return np.asarray(
+            PIL.ImageEnhance.Sharpness(image).enhance(factor), dtype=np.uint8
+        )
 
 
 def float_parameter(level: int, maxval: float, flip_sign: bool = False) -> float:

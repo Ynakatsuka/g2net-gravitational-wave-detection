@@ -148,4 +148,3 @@ class HardSampleROCAUCVisualizationHook(VisualizationHookBase):
             print(f"val_hard_roc: {score}")
 
         return self.result
-

@@ -190,7 +190,9 @@ def augment_and_mix(image, severity=3, width=3, depth=-1, alpha=1.0):
 
 
 class RandomAugMix(ImageOnlyTransform):
-    def __init__(self, severity=3, width=3, depth=-1, alpha=1.0, always_apply=False, p=0.5):
+    def __init__(
+        self, severity=3, width=3, depth=-1, alpha=1.0, always_apply=False, p=0.5
+    ):
         super().__init__(always_apply, p)
         self.severity = severity
         self.width = width
@@ -198,5 +200,7 @@ class RandomAugMix(ImageOnlyTransform):
         self.alpha = alpha
 
     def apply(self, image, **params):
-        image = augment_and_mix(image, self.severity, self.width, self.depth, self.alpha)
+        image = augment_and_mix(
+            image, self.severity, self.width, self.depth, self.alpha
+        )
         return image

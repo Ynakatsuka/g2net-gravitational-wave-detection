@@ -34,7 +34,9 @@ def cutmix(data, target, alpha=1.0):
 
     lam = np.random.beta(alpha, alpha)
     bbx1, bby1, bbx2, bby2 = rand_bbox(data.size(), lam)
-    bbx1_p, bby1_p, bbx2_p, bby2_p = rand_bbox_withwh(data.size(), bbx2 - bbx1, bby2 - bby1)
+    bbx1_p, bby1_p, bbx2_p, bby2_p = rand_bbox_withwh(
+        data.size(), bbx2 - bbx1, bby2 - bby1
+    )
 
     data[:, :, bby1_p:bby2_p, bbx1_p:bbx2_p] = data[indices, :, bby1:bby2, bbx1:bbx2]
     # adjust lambda to exactly match pixel ratio
@@ -101,7 +103,9 @@ def snapmix(data, target, model, snapmix_id, beta=1.0):
             ncont, size=(bbx2 - bbx1, bby2 - bby1), mode="bilinear", align_corners=True
         )
         data[:, :, bbx1:bbx2, bby1:bby2] = ncont
-        lam_a = 1 - wfmaps[:, bbx1:bbx2, bby1:bby2].sum(2).sum(1) / (wfmaps.sum(2).sum(1) + 1e-8)
+        lam_a = 1 - wfmaps[:, bbx1:bbx2, bby1:bby2].sum(2).sum(1) / (
+            wfmaps.sum(2).sum(1) + 1e-8
+        )
         lam_b = wfmaps_b[:, bbx1_1:bbx2_1, bby1_1:bby2_1].sum(2).sum(1) / (
             wfmaps_b.sum(2).sum(1) + 1e-8
         )

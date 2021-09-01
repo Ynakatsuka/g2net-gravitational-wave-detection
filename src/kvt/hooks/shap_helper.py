@@ -410,7 +410,8 @@ rgb_from_xyz = linalg.inv(xyz_from_rgb)
 # From https://en.wikipedia.org/wiki/CIE_1931_color_space
 # Note: Travis's code did not have the divide by 0.17697
 xyz_from_rgbcie = (
-    np.array([[0.49, 0.31, 0.20], [0.17697, 0.81240, 0.01063], [0.00, 0.01, 0.99]]) / 0.17697
+    np.array([[0.49, 0.31, 0.20], [0.17697, 0.81240, 0.01063], [0.00, 0.01, 0.99]])
+    / 0.17697
 )
 
 rgbcie_from_xyz = linalg.inv(xyz_from_rgbcie)
@@ -454,7 +455,9 @@ ycbcr_from_rgb = np.array(
 
 rgb_from_ycbcr = linalg.inv(ycbcr_from_rgb)
 
-ydbdr_from_rgb = np.array([[0.299, 0.587, 0.114], [-0.45, -0.883, 1.333], [-1.333, 1.116, 0.217]])
+ydbdr_from_rgb = np.array(
+    [[0.299, 0.587, 0.114], [-0.45, -0.883, 1.333], [-1.333, 1.116, 0.217]]
+)
 
 rgb_from_ydbdr = linalg.inv(ydbdr_from_rgb)
 
@@ -601,7 +604,9 @@ def _dtype_bits(kind, bits, itemsize=1):
     """
 
     s = next(
-        i for i in (itemsize,) + (2, 4, 8) if bits < (i * 8) or (bits == (i * 8) and kind == "u")
+        i
+        for i in (itemsize,) + (2, 4, 8)
+        if bits < (i * 8) or (bits == (i * 8) and kind == "u")
     )
 
     return np.dtype(kind + str(s))
@@ -746,7 +751,9 @@ def convert(image, dtype, force_copy=False, uniform=False):
         return image
 
     if not (dtype_in in _supported_types and dtype_out in _supported_types):
-        raise ValueError("Can not convert from {} to {}.".format(dtypeobj_in, dtypeobj_out))
+        raise ValueError(
+            "Can not convert from {} to {}.".format(dtypeobj_in, dtypeobj_out)
+        )
 
     if kind_in in "ui":
         imin_in = np.iinfo(dtype_in).min
@@ -776,13 +783,17 @@ def convert(image, dtype, force_copy=False, uniform=False):
             raise ValueError("Images of type float must be between -1 and 1.")
         # floating point -> integer
         # use float type that can represent output integer type
-        computation_type = _dtype_itemsize(itemsize_out, dtype_in, np.float32, np.float64)
+        computation_type = _dtype_itemsize(
+            itemsize_out, dtype_in, np.float32, np.float64
+        )
 
         if not uniform:
             if kind_out == "u":
                 image_out = np.multiply(image, imax_out, dtype=computation_type)
             else:
-                image_out = np.multiply(image, (imax_out - imin_out) / 2, dtype=computation_type)
+                image_out = np.multiply(
+                    image, (imax_out - imin_out) / 2, dtype=computation_type
+                )
                 image_out -= 1.0 / 2.0
             np.rint(image_out, out=image_out)
             np.clip(image_out, imin_out, imax_out, out=image_out)
@@ -800,7 +811,9 @@ def convert(image, dtype, force_copy=False, uniform=False):
     # signed/unsigned int -> float
     if kind_out == "f":
         # use float type that can exactly represent input integers
-        computation_type = _dtype_itemsize(itemsize_in, dtype_out, np.float32, np.float64)
+        computation_type = _dtype_itemsize(
+            itemsize_in, dtype_out, np.float32, np.float64
+        )
 
         if kind_in == "u":
             # using np.divide or np.multiply doesn't copy the data
@@ -933,7 +946,9 @@ red_rgb = lch2rgb(red_lch)
 # From: https://groups.google.com/forum/m/#!topic/openrefine/G7_PSdUeno0
 def ordinal_str(n):
     """Converts a number to and ordinal string."""
-    return str(n) + {1: "st", 2: "nd", 3: "rd"}.get(4 if 10 <= n % 100 < 20 else n % 10, "th")
+    return str(n) + {1: "st", 2: "nd", 3: "rd"}.get(
+        4 if 10 <= n % 100 < 20 else n % 10, "th"
+    )
 
 
 # TODO: we should support text output explanations (from models that output text not numbers), this would require the force
@@ -1041,7 +1056,9 @@ def text(
         return
 
     # set any unset bounds
-    xmin_new, xmax_new, cmax_new = values_min_max(shap_values.values, shap_values.base_values)
+    xmin_new, xmax_new, cmax_new = values_min_max(
+        shap_values.values, shap_values.base_values
+    )
     if xmin is None:
         xmin = xmin_new
     if xmax is None:
@@ -1443,9 +1460,7 @@ def svg_force_plot(values, base_values, fx, tokens, uuid, xmin, xmax):
         s += f'<text x="{(xpos(last_pos) + xpos(pos))/2}%" y="71" font-size="12px" fill="rgb{blue}" id="_fs_{uuid}_ind_{ind}" style="opacity: 0" dominant-baseline="middle" text-anchor="middle">{values[ind].round(3)}</text>'
 
         # the text label cropped and centered
-        s += (
-            f'<svg x="{xpos(last_pos)}%" y="40" height="20" width="{xpos(pos) - xpos(last_pos)}%">'
-        )
+        s += f'<svg x="{xpos(last_pos)}%" y="40" height="20" width="{xpos(pos) - xpos(last_pos)}%">'
         s += f'  <svg x="0" y="0" width="100%" height="100%">'
         s += f'    <text x="50%" y="9" font-size="12px" fill="rgb(255,255,255)" dominant-baseline="middle" text-anchor="middle">{tokens[ind].strip()}</text>'
         s += f"  </svg>"
@@ -1504,9 +1519,7 @@ def svg_force_plot(values, base_values, fx, tokens, uuid, xmin, xmax):
             s += f"</g>"
 
         # mouse over rectangle
-        s += (
-            f'<rect x="{xpos(last_pos)}%" y="40" height="20" width="{xpos(pos) - xpos(last_pos)}%"'
-        )
+        s += f'<rect x="{xpos(last_pos)}%" y="40" height="20" width="{xpos(pos) - xpos(last_pos)}%"'
         s += f'      onmouseover="'
         s += f"document.getElementById('_tp_{uuid}_ind_{ind}').style.textDecoration = 'underline';"
         s += f"document.getElementById('_fs_{uuid}_ind_{ind}').style.opacity = 1;"
@@ -1562,7 +1575,9 @@ def text_old(
             li = partition_tree[i, 0]
             ri = partition_tree[i, 1]
             groups.append(groups[li] + groups[ri])
-            lower_values[M + i] = lower_values[li] + lower_values[ri] + shap_values[M + i]
+            lower_values[M + i] = (
+                lower_values[li] + lower_values[ri] + shap_values[M + i]
+            )
             max_values[i + M] = max(
                 abs(shap_values[M + i]) / len(groups[M + i]),
                 max_values[li],
@@ -1656,7 +1671,9 @@ def text_old(
             value_label = str(shap_values[i].round(3))
         else:
             value_label = (
-                str((shap_values[i] * group_sizes[i]).round(3)) + " / " + str(group_sizes[i])
+                str((shap_values[i] * group_sizes[i]).round(3))
+                + " / "
+                + str(group_sizes[i])
             )
 
         # the HTML for this token
@@ -1761,7 +1778,9 @@ def saliency_plot(shap_values):
         group_sizes,
         token_id_to_node_id_mapping,
         collapsed_node_ids,
-    ) = process_shap_values(shap_values.data, unpacked_values[:, 0], 1, "", clustering, True)
+    ) = process_shap_values(
+        shap_values.data, unpacked_values[:, 0], 1, "", clustering, True
+    )
 
     def compress_shap_matrix(shap_matrix, group_sizes):
         compressed_matrix = np.zeros((group_sizes.shape[0], shap_matrix.shape[1]))
@@ -1784,9 +1803,13 @@ def saliency_plot(shap_values):
         for row_index in range(compressed_shap_matrix.shape[0]):
             input_colors_row = []
             for col_index in range(compressed_shap_matrix.shape[1]):
-                scaled_value = 0.5 + 0.5 * compressed_shap_matrix[row_index, col_index] / cmax
+                scaled_value = (
+                    0.5 + 0.5 * compressed_shap_matrix[row_index, col_index] / cmax
+                )
                 color = red_transparent_blue(scaled_value)
-                color = "rgba" + str((color[0] * 255, color[1] * 255, color[2] * 255, color[3]))
+                color = "rgba" + str(
+                    (color[0] * 255, color[1] * 255, color[2] * 255, color[3])
+                )
                 input_colors_row.append(color)
             input_colors.append(input_colors_row)
 
@@ -1920,9 +1943,9 @@ def heatmap(shap_values):
             color_values[uuid + "_output_flat_token_" + str(col_index)] = "rgba" + str(
                 get_color(shap_values.values[row_index][col_index], cmax)
             )
-            shap_values_list[uuid + "_output_flat_value_label_" + str(col_index)] = round(
-                shap_values.values[row_index][col_index], 3
-            )
+            shap_values_list[
+                uuid + "_output_flat_value_label_" + str(col_index)
+            ] = round(shap_values.values[row_index][col_index], 3)
 
         colors_dict[f"{uuid}_input_node_{row_index}_content"] = color_values
         shap_values_dict[f"{uuid}_input_node_{row_index}_content"] = shap_values_list
@@ -1933,14 +1956,21 @@ def heatmap(shap_values):
         color_values = {}
         shap_values_list = {}
 
-        for row_index in range(processed_values[col_index]["collapsed_node_ids"].shape[0]):
+        for row_index in range(
+            processed_values[col_index]["collapsed_node_ids"].shape[0]
+        ):
             color_values[
                 uuid
                 + "_input_node_"
                 + str(processed_values[col_index]["collapsed_node_ids"][row_index])
                 + "_content"
-            ] = "rgba" + str(get_color(processed_values[col_index]["values"][row_index], cmax))
-            shap_label_value_str = str(round(processed_values[col_index]["values"][row_index], 3))
+            ] = (
+                "rgba"
+                + str(get_color(processed_values[col_index]["values"][row_index], cmax))
+            )
+            shap_label_value_str = str(
+                round(processed_values[col_index]["values"][row_index], 3)
+            )
             if processed_values[col_index]["group_sizes"][row_index] > 1:
                 shap_label_value_str += "/" + str(
                     processed_values[col_index]["group_sizes"][row_index]
@@ -1954,7 +1984,9 @@ def heatmap(shap_values):
             ] = shap_label_value_str
 
         colors_dict[uuid + "_output_flat_token_" + str(col_index)] = color_values
-        shap_values_dict[uuid + "_output_flat_token_" + str(col_index)] = shap_values_list
+        shap_values_dict[
+            uuid + "_output_flat_token_" + str(col_index)
+        ] = shap_values_list
 
         token_id_to_node_id_mapping_dict = {}
 
@@ -2033,9 +2065,7 @@ def heatmap(shap_values):
         input_text_html += "</div>"
 
         if token_list_subtree[input_index][TREE_NODE_KEY_CHILDREN]:
-            input_text_html += (
-                f'<div id="{uuid}_input_node_{input_index}_content" style="display:inline;">'
-            )
+            input_text_html += f'<div id="{uuid}_input_node_{input_index}_content" style="display:inline;">'
             for child_index, child_content in token_list_subtree[input_index][
                 TREE_NODE_KEY_CHILDREN
             ].items():

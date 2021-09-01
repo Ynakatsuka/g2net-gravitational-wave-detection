@@ -1,16 +1,3 @@
-import lightly
-import pretrainedmodels
-import pytorch_lightning as pl
-import resnest.torch
-import timm
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import torchmetrics
-import torchvision
-import torchvision.models
-import transformers
-
 import kvt.callbacks
 import kvt.collate_fns
 import kvt.datasets
@@ -24,9 +11,33 @@ import kvt.models.sound_event_detections
 import kvt.optimizers
 import kvt.samplers
 import kvt.transforms
-from kvt.registry import (BACKBONES, CALLBACKS, COLLATE_FNS, DATASETS, HOOKS,
-                          LIGHTNING_MODULES, LOSSES, METRICS, MODELS,
-                          OPTIMIZERS, SAMPLERS, SCHEDULERS, TRANSFORMS)
+import lightly
+import pretrainedmodels
+import pytorch_lightning as pl
+import resnest.torch
+import timm
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torchmetrics
+import torchvision
+import torchvision.models
+import transformers
+from kvt.registry import (
+    BACKBONES,
+    CALLBACKS,
+    COLLATE_FNS,
+    DATASETS,
+    HOOKS,
+    LIGHTNING_MODULES,
+    LOSSES,
+    METRICS,
+    MODELS,
+    OPTIMIZERS,
+    SAMPLERS,
+    SCHEDULERS,
+    TRANSFORMS,
+)
 
 try:
     import torch_optimizer

@@ -114,7 +114,9 @@ class MADGRAD(torch.optim.Optimizer):
                         state["x0"] = torch.clone(p.data).detach()
 
                 if momentum != 0.0 and grad.is_sparse:
-                    raise RuntimeError("momentum != 0 is not compatible with sparse gradients")
+                    raise RuntimeError(
+                        "momentum != 0 is not compatible with sparse gradients"
+                    )
 
                 grad_sum_sq = state["grad_sum_sq"]
                 s = state["s"]

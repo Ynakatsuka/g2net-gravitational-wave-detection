@@ -75,7 +75,9 @@ def get_spectrum(freqs, decay_power, ch, h, w=0, z=0):
     :param w: Optional, second dimension size
     :param z: Optional, third dimension size
     """
-    scale = np.ones(1) / (np.maximum(freqs, np.array([1.0 / max(w, h, z)])) ** decay_power)
+    scale = np.ones(1) / (
+        np.maximum(freqs, np.array([1.0 / max(w, h, z)])) ** decay_power
+    )
 
     param_size = [ch] + list(freqs.shape) + [2]
     param = np.random.randn(*param_size)
@@ -132,7 +134,11 @@ def binarise_mask(mask, lam, in_shape, max_soft=0.0):
     """
     idx = mask.reshape(-1).argsort()[::-1]
     mask = mask.reshape(-1)
-    num = math.ceil(lam * mask.size) if random.random() > 0.5 else math.floor(lam * mask.size)
+    num = (
+        math.ceil(lam * mask.size)
+        if random.random() > 0.5
+        else math.floor(lam * mask.size)
+    )
 
     eff_soft = max_soft
     if max_soft > lam or max_soft > (1 - lam):
@@ -198,7 +204,9 @@ def get_spm(input, target, cropsize, model, clsw):
         outmaps = torch.stack(outmaps)
         if imgsize is not None:
             outmaps = outmaps.view(outmaps.size(0), 1, outmaps.size(1), outmaps.size(2))
-            outmaps = F.interpolate(outmaps, imgsize, mode="bilinear", align_corners=False)
+            outmaps = F.interpolate(
+                outmaps, imgsize, mode="bilinear", align_corners=False
+            )
 
         outmaps = outmaps.squeeze()
 

@@ -102,7 +102,9 @@ def get_sinusoid_encoding_table(n_position, d_hid, padding_idx=None):
     def get_posi_angle_vec(position):
         return [cal_angle(position, hid_j) for hid_j in range(d_hid)]
 
-    sinusoid_table = np.array([get_posi_angle_vec(pos_i) for pos_i in range(n_position)])
+    sinusoid_table = np.array(
+        [get_posi_angle_vec(pos_i) for pos_i in range(n_position)]
+    )
 
     sinusoid_table[:, 0::2] = np.sin(sinusoid_table[:, 0::2])  # dim 2i
     sinusoid_table[:, 1::2] = np.cos(sinusoid_table[:, 1::2])  # dim 2i+1
@@ -123,7 +125,9 @@ def get_sinusoid_encoding_table_2d(H, W, d_hid):
 
 
 class CBAM_Module(nn.Module):
-    def __init__(self, channels, reduction=4, attention_kernel_size=3, position_encode=False):
+    def __init__(
+        self, channels, reduction=4, attention_kernel_size=3, position_encode=False
+    ):
         super(CBAM_Module, self).__init__()
         self.position_encode = position_encode
         self.avg_pool = nn.AdaptiveAvgPool2d(1)

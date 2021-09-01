@@ -3,15 +3,14 @@ import os
 import pprint
 import sys
 
-sys.path.append("src/")
-
 import hydra
+import kvt
 import numpy as np
 import pandas as pd
+from kvt.utils import update_experiment_name
 from omegaconf import DictConfig, OmegaConf
 
-import kvt
-from kvt.utils import update_experiment_name
+sys.path.append("src/")
 
 
 @hydra.main(config_path="../../config", config_name="default")

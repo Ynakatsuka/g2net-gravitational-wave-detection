@@ -1,5 +1,4 @@
 import numpy as np
-
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
 
 
@@ -26,4 +25,3 @@ def sklearn_precision_score(pred, target, threshold=0.5):
 def sklearn_recall_score(pred, target, threshold=0.5):
     score = recall_score(target, pred >= threshold)
     return score
-

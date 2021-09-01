@@ -51,7 +51,11 @@ class NetVLAD(nn.Module):
         # calculate residuals to each clusters
         residual = x_flatten.expand(self.num_clusters, -1, -1, -1).permute(
             1, 0, 2, 3
-        ) - self.centroids.expand(x_flatten.size(-1), -1, -1).permute(1, 2, 0).unsqueeze(0)
+        ) - self.centroids.expand(x_flatten.size(-1), -1, -1).permute(
+            1, 2, 0
+        ).unsqueeze(
+            0
+        )
         residual *= soft_assign.unsqueeze(2)
         vlad = residual.sum(dim=-1)
 

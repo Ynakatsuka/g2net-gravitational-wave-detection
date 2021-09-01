@@ -53,17 +53,15 @@ class BucketSampler(torch.utils.data.Sampler):
     """
 
     def __init__(
-        self,
-        dataset,
-        bucket_size=None,
-        batch_size=1536,
-        shuffle=True,
+        self, dataset, bucket_size=None, batch_size=1536, shuffle=True,
     ):
         super().__init__(dataset)
         self.shuffle = shuffle
         self.batch_size = batch_size
         self.sort_keys = np.array(dataset.lengths)
-        self.bucket_size = bucket_size if bucket_size is not None else len(self.sort_keys)
+        self.bucket_size = (
+            bucket_size if bucket_size is not None else len(self.sort_keys)
+        )
         if not shuffle:
             self.index = prepare_buckets(
                 self.sort_keys,

@@ -10,13 +10,12 @@ import torch.nn.functional as F
 from kvt.augmentation import SpecAugmentationPlusPlus
 from kvt.models.layers import AttBlockV2
 from kvt.models.sound_event_detections import (
-    Loudness,
     PCENTransform,
     add_frequency_encoding,
     add_time_encoding,
     make_delta,
 )
-from nnAudio.Spectrogram import CQT1992v2, CQT2010v2
+from nnAudio.Spectrogram import CQT1992v2
 from torchlibrosa.augmentation import SpecAugmentation
 from torchvision import transforms
 
@@ -363,4 +362,3 @@ class PositionalEncoding(nn.Module):
         """
         x = x + self.pe[: x.size(0)]
         return self.dropout(x)
-

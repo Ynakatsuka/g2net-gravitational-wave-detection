@@ -20,7 +20,9 @@ def train2cabins(windows, num_cabin=8):
     points_cabin = num_points // num_cabin
     for idx in range(num_cabin):
         cabins[:, :, :, idx] = torch.max(
-            windows[:, :, :, idx * points_cabin : (idx + 1) * points_cabin], dim=3, keepdim=False
+            windows[:, :, :, idx * points_cabin : (idx + 1) * points_cabin],
+            dim=3,
+            keepdim=False,
         )[0]
 
     return cabins
@@ -78,11 +80,15 @@ class SoftPool(nn.Module):
 
         for region in range(self.regions):
             x_val, x_idx = torch.sort(val_activa[:, region, :], dim=1, descending=True)
-            index = x_idx[:, : self.pnt_per_sort].unsqueeze(1).repeat(1, self.size_feat, 1)
+            index = (
+                x_idx[:, : self.pnt_per_sort].unsqueeze(1).repeat(1, self.size_feat, 1)
+            )
 
             sp_cube[:, :, region, :] = torch.gather(x, dim=2, index=index)
             sp_idx[:, :, region, :] = (
-                x_idx[:, : self.pnt_per_sort].unsqueeze(1).repeat(1, self.regions + 3, 1)
+                x_idx[:, : self.pnt_per_sort]
+                .unsqueeze(1)
+                .repeat(1, self.regions + 3, 1)
             )
 
         # local pointnet feature
@@ -103,6 +109,8 @@ class SoftPool(nn.Module):
 
         scope = "local"
         if scope == "global":
-            sp_cube = torch.cat((sp_cube, sp_windows, sp_trains, sp_station), 1).contiguous()
+            sp_cube = torch.cat(
+                (sp_cube, sp_windows, sp_trains, sp_station), 1
+            ).contiguous()
 
         return sp_cube, sp_idx, cabins, id_activa

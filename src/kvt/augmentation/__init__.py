@@ -1,6 +1,14 @@
-from .audio import (CosineVolume, LowFrequencyMask, OneOf, PinkNoise,
-                    RandomVolume, SpecifiedNoise, SpeedTuning, StretchAudio,
-                    TimeShift)
+from .audio import (
+    CosineVolume,
+    LowFrequencyMask,
+    OneOf,
+    PinkNoise,
+    RandomVolume,
+    SpecifiedNoise,
+    SpeedTuning,
+    StretchAudio,
+    TimeShift,
+)
 from .augmix import RandomAugMix
 from .autoaugment import ImageNetPolicy
 from .block_fade import BlockFade

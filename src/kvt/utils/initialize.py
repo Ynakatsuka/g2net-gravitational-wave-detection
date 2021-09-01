@@ -46,11 +46,7 @@ def reinitialize_model(config, model):
 
 
 def initialize_transformer_models(
-    config,
-    model,
-    learning_rate,
-    weight_decay,
-    layerwise_learning_rate_decay=0.9,
+    config, model, learning_rate, weight_decay, layerwise_learning_rate_decay=0.9,
 ):
     """
     Ref: https://www.kaggle.com/rhtsingh/on-stability-of-few-sample-transformer-fine-tuning
@@ -62,7 +58,9 @@ def initialize_transformer_models(
     optimizer_grouped_parameters = [
         {
             "params": [
-                p for n, p in model.named_parameters() if "classifier" in n or "pooler" in n
+                p
+                for n, p in model.named_parameters()
+                if "classifier" in n or "pooler" in n
             ],
             "weight_decay": 0.0,
             "lr": learning_rate,
@@ -79,14 +77,18 @@ def initialize_transformer_models(
         optimizer_grouped_parameters += [
             {
                 "params": [
-                    p for n, p in layer.named_parameters() if not any(nd in n for nd in no_decay)
+                    p
+                    for n, p in layer.named_parameters()
+                    if not any(nd in n for nd in no_decay)
                 ],
                 "weight_decay": weight_decay,
                 "lr": lr,
             },
             {
                 "params": [
-                    p for n, p in layer.named_parameters() if any(nd in n for nd in no_decay)
+                    p
+                    for n, p in layer.named_parameters()
+                    if any(nd in n for nd in no_decay)
                 ],
                 "weight_decay": 0.0,
                 "lr": lr,

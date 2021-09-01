@@ -11,7 +11,9 @@ class Conv3x3GNReLU(nn.Module):
         super().__init__()
         self.upsample = upsample
         self.block = nn.Sequential(
-            nn.Conv2d(in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False),
+            nn.Conv2d(
+                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
+            ),
             nn.GroupNorm(32, out_channels),
             nn.ReLU(inplace=True),
         )
@@ -81,10 +83,18 @@ class Decoder(nn.Module):
         self.p3 = FPNBlock(pyramid_channels, in_channels[2])
         self.p2 = FPNBlock(pyramid_channels, in_channels[3])
 
-        self.s5 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=4)
-        self.s4 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=3)
-        self.s3 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=2)
-        self.s2 = SegmentationBlock(pyramid_channels, segmentation_channels, n_upsamples=1)
+        self.s5 = SegmentationBlock(
+            pyramid_channels, segmentation_channels, n_upsamples=4
+        )
+        self.s4 = SegmentationBlock(
+            pyramid_channels, segmentation_channels, n_upsamples=3
+        )
+        self.s3 = SegmentationBlock(
+            pyramid_channels, segmentation_channels, n_upsamples=2
+        )
+        self.s2 = SegmentationBlock(
+            pyramid_channels, segmentation_channels, n_upsamples=1
+        )
 
         self.dropout = nn.Dropout2d(p=dropout)
 
@@ -119,7 +129,9 @@ class Decoder(nn.Module):
         else:
             self.merge_op = None
 
-        self.final_conv = nn.Conv2d(segmentation_channels, num_classes, kernel_size=1, padding=0)
+        self.final_conv = nn.Conv2d(
+            segmentation_channels, num_classes, kernel_size=1, padding=0
+        )
         self.initialize()
 
     def forward(self, x, encodes):
