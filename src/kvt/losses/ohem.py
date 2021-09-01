@@ -21,11 +21,15 @@ def oh_cross_entropy_loss(input, target, reduction):
     elif reduction == "sum":
         return loss.sum()
     else:
-        raise ValueError("`reduction` must be one of 'none', 'mean', or 'sum'.")
+        raise ValueError(
+            "`reduction` must be one of 'none', 'mean', or 'sum'."
+        )
 
 
 class OHEMLoss(nn.Module):
-    def __init__(self, rate=0.7, loss=None, weight=None, params={}, smoothing_eps=0):
+    def __init__(
+        self, rate=0.7, loss=None, weight=None, params={}, smoothing_eps=0
+    ):
         super().__init__()
         self.rate = rate
         self.smoothing_eps = smoothing_eps
@@ -94,7 +98,9 @@ class OHEMLossWithLogits(nn.Module):
                     pred, target, reduction="none", ignore_index=-1
                 )
             else:
-                ohem_cls_loss = F.cross_entropy(pred, target.long(), reduction="none")
+                ohem_cls_loss = F.cross_entropy(
+                    pred, target.long(), reduction="none"
+                )
 
         sorted_ohem_loss, idx = torch.sort(ohem_cls_loss, descending=True)
 

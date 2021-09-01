@@ -39,6 +39,8 @@ class LightningModuleMLM(LightningModuleBase):
                 avg_outputs[key] = value.mean()
 
         if not self.trainer.sanity_checking:
-            self.log_dict(avg_outputs, on_epoch=True, prog_bar=True, logger=True)
+            self.log_dict(
+                avg_outputs, on_epoch=True, prog_bar=True, logger=True
+            )
 
         return avg_outputs

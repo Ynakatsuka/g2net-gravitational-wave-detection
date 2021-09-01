@@ -12,7 +12,12 @@ from torch.nn import Parameter
 
 class AdaCos(nn.Module):
     def __init__(
-        self, in_features, out_features, m=0.50, ls_eps=0, theta_zero=math.pi / 4
+        self,
+        in_features,
+        out_features,
+        m=0.50,
+        ls_eps=0,
+        theta_zero=math.pi / 4,
     ):
         super(AdaCos, self).__init__()
         self.in_features = in_features
@@ -37,17 +42,23 @@ class AdaCos(nn.Module):
         one_hot = torch.zeros_like(logits)
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
         if self.ls_eps > 0:
-            one_hot = (1 - self.ls_eps) * one_hot + self.ls_eps / self.out_features
+            one_hot = (
+                1 - self.ls_eps
+            ) * one_hot + self.ls_eps / self.out_features
         output = logits * (1 - one_hot) + target_logits * one_hot
         # feature re-scale
         with torch.no_grad():
             B_avg = torch.where(
-                one_hot < 1, torch.exp(self.s * logits), torch.zeros_like(logits)
+                one_hot < 1,
+                torch.exp(self.s * logits),
+                torch.zeros_like(logits),
             )
             B_avg = torch.sum(B_avg) / input.size(0)
             theta_med = torch.median(theta)
             self.s = torch.log(B_avg) / torch.cos(
-                torch.min(self.theta_zero * torch.ones_like(theta_med), theta_med)
+                torch.min(
+                    self.theta_zero * torch.ones_like(theta_med), theta_med
+                )
             )
         output *= self.s
 
@@ -65,7 +76,13 @@ class ArcMarginProduct(nn.Module):
     """
 
     def __init__(
-        self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0
+        self,
+        in_features,
+        out_features,
+        s=30.0,
+        m=0.50,
+        easy_margin=False,
+        ls_eps=0.0,
     ):
         super(ArcMarginProduct, self).__init__()
         self.in_features = in_features
@@ -96,7 +113,9 @@ class ArcMarginProduct(nn.Module):
         one_hot = torch.zeros(cosine.size(), device="cuda")
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
         if self.ls_eps > 0:
-            one_hot = (1 - self.ls_eps) * one_hot + self.ls_eps / self.out_features
+            one_hot = (
+                1 - self.ls_eps
+            ) * one_hot + self.ls_eps / self.out_features
         # -------------torch.where(out_i = {x_i if condition_i else y_i) -------------
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
         output *= self.s
@@ -211,7 +230,9 @@ class SphereProduct(nn.Module):
         one_hot.scatter_(1, label.view(-1, 1), 1)
 
         # --------------------------- Calculate output ---------------------------
-        output = (one_hot * (phi_theta - cos_theta) / (1 + self.lamb)) + cos_theta
+        output = (
+            one_hot * (phi_theta - cos_theta) / (1 + self.lamb)
+        ) + cos_theta
         output *= NormOfFeature.view(-1, 1)
 
         return output
@@ -259,7 +280,9 @@ class CurricularFace(nn.Module):
         kernel_norm = l2_norm(self.kernel, axis=0)
         cos_theta = torch.mm(embbedings, kernel_norm)
         cos_theta = cos_theta.clamp(-1, 1)  # for numerical stability
-        target_logit = cos_theta[torch.arange(0, embbedings.size(0)), label].view(-1, 1)
+        target_logit = cos_theta[
+            torch.arange(0, embbedings.size(0)), label
+        ].view(-1, 1)
 
         sin_theta = torch.sqrt(1.0 - torch.pow(target_logit, 2))
         cos_theta_m = (

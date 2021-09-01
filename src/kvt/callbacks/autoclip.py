@@ -22,4 +22,6 @@ class AutoClip(pl.callbacks.Callback):
         grad_norm = self.compute_grad_norm(pl_module.model)
         self.grad_history.append(grad_norm)
         clip_value = np.percentile(self.grad_history, self.percentile)
-        torch.nn.utils.clip_grad_norm_(pl_module.model.parameters(), clip_value)
+        torch.nn.utils.clip_grad_norm_(
+            pl_module.model.parameters(), clip_value
+        )

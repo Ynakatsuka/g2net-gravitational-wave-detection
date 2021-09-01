@@ -51,7 +51,9 @@ def get_image_transform(cfg):
 
 def base_transform(aug_cfg=None, **_):
     if aug_cfg is not None:
-        raise ValueError("When using base_transform, augmentation must be None.")
+        raise ValueError(
+            "When using base_transform, augmentation must be None."
+        )
     return lambda x: x
 
 

@@ -199,7 +199,9 @@ class JointOptimizationLoss(nn.Module):
                 avg_proba = probas.mean(0)
                 L_c = soft_cross_entropy_loss(logits, targets)
                 L_p = -torch.sum(torch.log(avg_proba) * p)
-                L_e = -torch.mean(torch.sum(probas * F.log_softmax(logits, 1), 1))
+                L_e = -torch.mean(
+                    torch.sum(probas * F.log_softmax(logits, 1), 1)
+                )
                 loss = L_c + self.alpha * L_p + self.beta * L_e
                 if self.update_target:
                     count = self.current_epoch % self.window
@@ -211,7 +213,9 @@ class JointOptimizationLoss(nn.Module):
     def init_targets(self, targets):
         # Both on CPU
         self.soft_targets = torch.eye(6)[torch.from_numpy(targets)].float()
-        self.pseudo_targets = torch.zeros((self.window, len(targets), 6)).float()
+        self.pseudo_targets = torch.zeros(
+            (self.window, len(targets), 6)
+        ).float()
         if self.debug:
             print(
                 "soft_targets, pseudo_targets: ",
@@ -259,7 +263,9 @@ class SymmetricCrossEntropy(nn.Module):
         device = logits.device
         onehot_targets = torch.eye(6)[targets].to(device)
         ce_loss = F.cross_entropy(logits, targets, reduction=reduction)
-        rce_loss = (-onehot_targets * logits.softmax(1).clamp(1e-7, 1.0).log()).sum(1)
+        rce_loss = (
+            -onehot_targets * logits.softmax(1).clamp(1e-7, 1.0).log()
+        ).sum(1)
         if reduction == "mean":
             rce_loss = rce_loss.mean()
         elif reduction == "sum":
@@ -352,7 +358,9 @@ class IterativeSelfLearningLoss(nn.Module):
                 targets.device
             )
 
-        _, noisy_targets = _check_input_type(logits, noisy_targets, self.loss_name)
+        _, noisy_targets = _check_input_type(
+            logits, noisy_targets, self.loss_name
+        )
         _, corrected_targets = _check_input_type(
             logits, corrected_targets, self.loss_name
         )

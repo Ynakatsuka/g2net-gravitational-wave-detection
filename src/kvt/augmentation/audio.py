@@ -124,7 +124,9 @@ class SpeedTuning(BaseWaveformTransform):
 
     def apply(self, y: np.ndarray, sr):
         len_y = len(y)
-        speed_rate = np.random.uniform(1 - self.speed_range, 1 + self.speed_range)
+        speed_rate = np.random.uniform(
+            1 - self.speed_range, 1 + self.speed_range
+        )
         y_speed_tune = cv2.resize(y, (1, int(len(y) * speed_rate))).squeeze()
 
         if len(y_speed_tune) < len_y:
@@ -136,7 +138,9 @@ class SpeedTuning(BaseWaveformTransform):
             ]
         else:
             cut_len = len(y_speed_tune) - len_y
-            y_speed_tune = y_speed_tune[int(cut_len / 2) : int(cut_len / 2) + len_y]
+            y_speed_tune = y_speed_tune[
+                int(cut_len / 2) : int(cut_len / 2) + len_y
+            ]
 
         return y_speed_tune.astype("float32")
 
@@ -153,7 +157,9 @@ class StretchAudio(BaseWaveformTransform):
         if len(data) > input_length:
             data = data[:input_length]
         else:
-            data = np.pad(data, (0, max(0, input_length - len(data))), "constant")
+            data = np.pad(
+                data, (0, max(0, input_length - len(data))), "constant"
+            )
 
         return data.astype("float32")
 
@@ -189,7 +195,9 @@ class LowFrequencyMask(BaseWaveformTransform):
 
     def apply(self, au, sr):
         if np.random.binomial(n=1, p=self.p) or self.allways_apply:
-            cutoff_value = np.random.uniform(low=self.min_cutoff, high=self.max_cutoff)
+            cutoff_value = np.random.uniform(
+                low=self.min_cutoff, high=self.max_cutoff
+            )
             au = butter_lowpass_filter(au, cutoff=cutoff_value, fs=sr / 1000)
 
         return au.astype("float32")
@@ -208,7 +216,9 @@ class SpecifiedNoise(BaseWaveformTransform):
     ):
         super().__init__(p)
         filenames = glob.glob(os.path.join(noise_folder_path, "*.wav"))
-        self.noises = [librosa.load(noise_path, sr=None)[0] for noise_path in filenames]
+        self.noises = [
+            librosa.load(noise_path, sr=None)[0] for noise_path in filenames
+        ]
         self.noises = [librosa.util.normalize(noise) for noise in self.noises]
         self.p = p
         self.allways_apply = allways_apply
@@ -218,7 +228,9 @@ class SpecifiedNoise(BaseWaveformTransform):
     def apply(self, au, sr):
         if np.random.binomial(n=1, p=self.p) or self.allways_apply:
             alpha = np.random.uniform(low=self.low_alpha, high=self.high_alpha)
-            noise = self.noises[np.random.randint(low=0, high=len(self.noises))]
+            noise = self.noises[
+                np.random.randint(low=0, high=len(self.noises))
+            ]
 
             # Repeat the sound if it shorter than the input sound
             num_samples = len(au)

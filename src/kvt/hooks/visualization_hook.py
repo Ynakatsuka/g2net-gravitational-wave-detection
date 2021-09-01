@@ -54,7 +54,9 @@ class VisualizationHookBase(object):
         self.figsize = figsize
 
         sns.set()
-        self.filename = f"{experiment_name}_{self.__class__.__name__}{suffix}.png"
+        self.filename = (
+            f"{experiment_name}_{self.__class__.__name__}{suffix}.png"
+        )
         self.save_path = os.path.join(dirpath, self.filename)
         self.result = {self.__class__.__name__ + suffix: self.save_path}
 
@@ -68,7 +70,10 @@ class VisualizationHookBase(object):
 class ScatterPlotVisualizationHook(VisualizationHookBase):
     def __call__(self, model, dataloader, predictions, targets, logger=None):
         df = pd.DataFrame(
-            {"predictions": predictions.flatten(), "targets": targets.flatten()}
+            {
+                "predictions": predictions.flatten(),
+                "targets": targets.flatten(),
+            }
         )
         df.sort_values("predictions", inplace=True)
 
@@ -98,7 +103,10 @@ class LiftChartVisualizationHook(VisualizationHookBase):
 
     def __call__(self, model, dataloader, predictions, targets, logger=None):
         df = pd.DataFrame(
-            {"predictions": predictions.flatten(), "targets": targets.flatten()}
+            {
+                "predictions": predictions.flatten(),
+                "targets": targets.flatten(),
+            }
         )
         df.sort_values("predictions", inplace=True)
 
@@ -116,7 +124,12 @@ class LiftChartVisualizationHook(VisualizationHookBase):
 
 class HeatmapVisualizationHook(VisualizationHookBase):
     def __init__(
-        self, dirpath, experiment_name, figsize=(20, 20), classes=None, normalize=True
+        self,
+        dirpath,
+        experiment_name,
+        figsize=(20, 20),
+        classes=None,
+        normalize=True,
     ):
         super().__init__(dirpath, experiment_name, figsize)
         self.classes = classes
@@ -188,7 +201,9 @@ class GradCamVisualizationHook(VisualizationHookBase):
         batch = iter(dataloader).next()
         for x in batch["x"]:
             out = model(x.unsqueeze(0))
-            activation_map = cam_extractor(out.unsqueeze(0).argmax().item(), out)
+            activation_map = cam_extractor(
+                out.unsqueeze(0).argmax().item(), out
+            )
             inputs.append(x)
             output_cams.append(activation_map)
         return inputs, output_cams
@@ -203,13 +218,17 @@ class GradCamVisualizationHook(VisualizationHookBase):
         n_rows = int(math.ceil(self.num_plots / n_cols))
 
         plt.clf()
-        _, axes = plt.subplots(n_rows, n_cols, figsize=self.figsize, tight_layout=True)
+        _, axes = plt.subplots(
+            n_rows, n_cols, figsize=self.figsize, tight_layout=True
+        )
 
         for i in range(n_rows * n_cols):
             if i < self.num_plots:
                 inp = self.unnormalize(inputs[i])
                 overlay_cam = overlay_mask(
-                    to_pil_image(inp), to_pil_image(cams[i], mode="F"), alpha=0.5
+                    to_pil_image(inp),
+                    to_pil_image(cams[i], mode="F"),
+                    alpha=0.5,
                 )
                 original_inputs = to_pil_image(inp)
                 to_show = hstack_pil_image(original_inputs, overlay_cam)
@@ -234,7 +253,9 @@ class GradCamVisualizationHook(VisualizationHookBase):
             indices = np.argsort(deviation)[-self.num_plots :]
 
         # create new dataloader
-        new_dataloader = make_subset_dataloader(dataloader, indices, self.num_plots)
+        new_dataloader = make_subset_dataloader(
+            dataloader, indices, self.num_plots
+        )
         top_inputs, top_cams = self._extract_cam_on_first_batch(
             cam_extractor, model, new_dataloader
         )
@@ -266,7 +287,9 @@ class ShapTextVisualizationHook(VisualizationHookBase):
         self.select_top_predictions = select_top_predictions
 
         sns.set()
-        self.filename = f"{experiment_name}_{self.__class__.__name__}{suffix}.html"
+        self.filename = (
+            f"{experiment_name}_{self.__class__.__name__}{suffix}.html"
+        )
         self.save_path = os.path.join(dirpath, self.filename)
         self.result = {self.__class__.__name__ + suffix: self.save_path}
 

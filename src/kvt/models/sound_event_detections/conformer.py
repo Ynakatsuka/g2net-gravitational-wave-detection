@@ -81,7 +81,9 @@ class PreNorm(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, heads=8, dim_head=64, dropout=0.0, max_pos_emb=512):
+    def __init__(
+        self, dim, heads=8, dim_head=64, dropout=0.0, max_pos_emb=512
+    ):
         super().__init__()
         inner_dim = dim_head * heads
         self.heads = heads
@@ -106,7 +108,9 @@ class Attention(nn.Module):
         context = default(context, x)
 
         q, k, v = (self.to_q(x), *self.to_kv(context).chunk(2, dim=-1))
-        q, k, v = map(lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), (q, k, v))
+        q, k, v = map(
+            lambda t: rearrange(t, "b n (h d) -> b h n d", h=h), (q, k, v)
+        )
 
         dots = einsum("b h i d, b h j d -> b h i j", q, k) * self.scale
 
@@ -115,16 +119,21 @@ class Attention(nn.Module):
         dist = rearrange(seq, "i -> i ()") - rearrange(seq, "j -> () j")
         dist = dist.clamp(-max_pos_emb, max_pos_emb) + max_pos_emb
         rel_pos_emb = self.rel_pos_emb(dist).to(q)
-        pos_attn = einsum("b h n d, n r d -> b h n r", q, rel_pos_emb) * self.scale
+        pos_attn = (
+            einsum("b h n d, n r d -> b h n r", q, rel_pos_emb) * self.scale
+        )
         dots = dots + pos_attn
 
         if exists(mask) or exists(context_mask):
-            mask = default(mask, lambda: torch.ones(*x.shape[:2], device=device))
+            mask = default(
+                mask, lambda: torch.ones(*x.shape[:2], device=device)
+            )
             context_mask = (
                 default(context_mask, mask)
                 if not has_context
                 else default(
-                    context_mask, lambda: torch.ones(*context.shape[:2], device=device)
+                    context_mask,
+                    lambda: torch.ones(*context.shape[:2], device=device),
                 )
             )
             mask_value = -torch.finfo(dots.dtype).max
@@ -158,12 +167,21 @@ class FeedForward(nn.Module):
 
 class ConformerConvModule(nn.Module):
     def __init__(
-        self, dim, causal=False, expansion_factor=2, kernel_size=31, dropout=0.0
+        self,
+        dim,
+        causal=False,
+        expansion_factor=2,
+        kernel_size=31,
+        dropout=0.0,
     ):
         super().__init__()
 
         inner_dim = dim * expansion_factor
-        padding = calc_same_padding(kernel_size) if not causal else (kernel_size - 1, 0)
+        padding = (
+            calc_same_padding(kernel_size)
+            if not causal
+            else (kernel_size - 1, 0)
+        )
 
         self.net = nn.Sequential(
             nn.LayerNorm(dim),

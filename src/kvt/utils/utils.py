@@ -31,7 +31,9 @@ def trace(title, logger=None):
     delta = m1 - m0
     sign = "+" if delta >= 0 else "-"
     delta = math.fabs(delta)
-    message = f"[{m1:.1f}GB({sign}{delta:.1f}GB):{time.time() - t0:.1f}sec] {title} "
+    message = (
+        f"[{m1:.1f}GB({sign}{delta:.1f}GB):{time.time() - t0:.1f}sec] {title} "
+    )
     print(message)
     if logger is not None:
         logger.info(message)
@@ -57,7 +59,9 @@ def update_experiment_name(config):
         if not config.experiment_name:
             config.experiment_name = "default"
 
-        if hasattr(config.trainer, "logger") and (not config.trainer.logger.name):
+        if hasattr(config.trainer, "logger") and (
+            not config.trainer.logger.name
+        ):
             config.trainer.logger.name = "default"
 
     return config

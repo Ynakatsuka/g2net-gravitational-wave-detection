@@ -46,7 +46,9 @@ class DenseNetEncoder(nn.Module):
     def initialize(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+                nn.init.kaiming_normal_(
+                    m.weight, mode="fan_out", nonlinearity="relu"
+                )
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
@@ -105,7 +107,9 @@ class SENetEncoder(nn.Module):
 
 class EfficientNetEncoder(EfficientNet):
     def __init__(self, skip_connections, model_name):
-        blocks_args, global_params = get_model_params(model_name, override_params=None)
+        blocks_args, global_params = get_model_params(
+            model_name, override_params=None
+        )
 
         super().__init__(blocks_args, global_params)
         self._skip_connections = list(skip_connections)
@@ -153,10 +157,12 @@ def build_encoder(backbone):
     elif backbone_name.startswith("densenet"):
         encoder = DenseNetEncoder(backbone)
     elif backbone_name.startswith("eff"):
-        encoder = EfficientNetEncoder(**efficient_net_encoders[backbone_name]["params"])
-        settings = efficient_net_encoders[backbone_name]["pretrained_settings"][
-            "imagenet"
-        ]
+        encoder = EfficientNetEncoder(
+            **efficient_net_encoders[backbone_name]["params"]
+        )
+        settings = efficient_net_encoders[backbone_name][
+            "pretrained_settings"
+        ]["imagenet"]
         encoder.load_state_dict(model_zoo.load_url(settings["url"]))
         encoder.channels = efficient_net_encoders[backbone_name]["out_shapes"]
 
@@ -202,48 +208,72 @@ efficient_net_encoders = {
         "encoder": EfficientNetEncoder,
         "out_shapes": (320, 112, 40, 24, 32),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b0"),
-        "params": {"skip_connections": [3, 5, 9], "model_name": "efficientnet-b0"},
+        "params": {
+            "skip_connections": [3, 5, 9],
+            "model_name": "efficientnet-b0",
+        },
     },
     "efficientnet-b1": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (320, 112, 40, 24, 32),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b1"),
-        "params": {"skip_connections": [5, 8, 16], "model_name": "efficientnet-b1"},
+        "params": {
+            "skip_connections": [5, 8, 16],
+            "model_name": "efficientnet-b1",
+        },
     },
     "efficientnet-b2": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (352, 120, 48, 24, 32),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b2"),
-        "params": {"skip_connections": [5, 8, 16], "model_name": "efficientnet-b2"},
+        "params": {
+            "skip_connections": [5, 8, 16],
+            "model_name": "efficientnet-b2",
+        },
     },
     "efficientnet-b3": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (384, 136, 48, 32, 40),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b3"),
-        "params": {"skip_connections": [5, 8, 18], "model_name": "efficientnet-b3"},
+        "params": {
+            "skip_connections": [5, 8, 18],
+            "model_name": "efficientnet-b3",
+        },
     },
     "efficientnet-b4": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (448, 160, 56, 32, 48),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b4"),
-        "params": {"skip_connections": [6, 10, 22], "model_name": "efficientnet-b4"},
+        "params": {
+            "skip_connections": [6, 10, 22],
+            "model_name": "efficientnet-b4",
+        },
     },
     "efficientnet-b5": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (512, 176, 64, 40, 48),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b5"),
-        "params": {"skip_connections": [8, 13, 27], "model_name": "efficientnet-b5"},
+        "params": {
+            "skip_connections": [8, 13, 27],
+            "model_name": "efficientnet-b5",
+        },
     },
     "efficientnet-b6": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (576, 200, 72, 40, 56),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b6"),
-        "params": {"skip_connections": [9, 15, 31], "model_name": "efficientnet-b6"},
+        "params": {
+            "skip_connections": [9, 15, 31],
+            "model_name": "efficientnet-b6",
+        },
     },
     "efficientnet-b7": {
         "encoder": EfficientNetEncoder,
         "out_shapes": (640, 224, 80, 48, 64),
         "pretrained_settings": _get_pretrained_settings("efficientnet-b7"),
-        "params": {"skip_connections": [11, 18, 38], "model_name": "efficientnet-b7"},
+        "params": {
+            "skip_connections": [11, 18, 38],
+            "model_name": "efficientnet-b7",
+        },
     },
 }

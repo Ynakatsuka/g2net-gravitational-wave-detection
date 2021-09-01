@@ -144,7 +144,9 @@ def register_torch_modules():
     SCHEDULERS.register(transformers.get_constant_schedule)
     SCHEDULERS.register(transformers.get_constant_schedule_with_warmup)
     SCHEDULERS.register(transformers.get_cosine_schedule_with_warmup)
-    SCHEDULERS.register(transformers.get_cosine_with_hard_restarts_schedule_with_warmup)
+    SCHEDULERS.register(
+        transformers.get_cosine_with_hard_restarts_schedule_with_warmup
+    )
     SCHEDULERS.register(transformers.get_linear_schedule_with_warmup)
     SCHEDULERS.register(transformers.get_polynomial_decay_schedule_with_warmup)
 
@@ -193,7 +195,9 @@ def register_torch_modules():
     COLLATE_FNS.register(transformers.DataCollatorForSeq2Seq)
     COLLATE_FNS.register(transformers.DataCollatorForLanguageModeling)
     COLLATE_FNS.register(transformers.DataCollatorForWholeWordMask)
-    COLLATE_FNS.register(transformers.DataCollatorForPermutationLanguageModeling)
+    COLLATE_FNS.register(
+        transformers.DataCollatorForPermutationLanguageModeling
+    )
 
     for name, cls in lightly.data.collate.__dict__.items():
         if not callable(cls):

@@ -94,7 +94,9 @@ def make_low_freq_image(decay, shape, ch=1):
     :param ch: Number of channels for desired mask
     """
     freqs = fftfreqnd(*shape)
-    spectrum = get_spectrum(freqs, decay, ch, *shape)  # .reshape((1, *shape[:-1], -1))
+    spectrum = get_spectrum(
+        freqs, decay, ch, *shape
+    )  # .reshape((1, *shape[:-1], -1))
     spectrum = spectrum[:, 0] + 1j * spectrum[:, 1]
     mask = np.real(np.fft.irfftn(spectrum, shape))
 
@@ -203,7 +205,9 @@ def get_spm(input, target, cropsize, model, clsw):
 
         outmaps = torch.stack(outmaps)
         if imgsize is not None:
-            outmaps = outmaps.view(outmaps.size(0), 1, outmaps.size(1), outmaps.size(2))
+            outmaps = outmaps.view(
+                outmaps.size(0), 1, outmaps.size(1), outmaps.size(2)
+            )
             outmaps = F.interpolate(
                 outmaps, imgsize, mode="bilinear", align_corners=False
             )

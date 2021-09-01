@@ -126,15 +126,23 @@ def get_sinusoid_encoding_table_2d(H, W, d_hid):
 
 class CBAM_Module(nn.Module):
     def __init__(
-        self, channels, reduction=4, attention_kernel_size=3, position_encode=False
+        self,
+        channels,
+        reduction=4,
+        attention_kernel_size=3,
+        position_encode=False,
     ):
         super(CBAM_Module, self).__init__()
         self.position_encode = position_encode
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.max_pool = nn.AdaptiveMaxPool2d(1)
-        self.fc1 = nn.Conv2d(channels, channels // reduction, kernel_size=1, padding=0)
+        self.fc1 = nn.Conv2d(
+            channels, channels // reduction, kernel_size=1, padding=0
+        )
         self.relu = nn.ReLU(inplace=True)
-        self.fc2 = nn.Conv2d(channels // reduction, channels, kernel_size=1, padding=0)
+        self.fc2 = nn.Conv2d(
+            channels // reduction, channels, kernel_size=1, padding=0
+        )
         self.sigmoid_channel = nn.Sigmoid()
         if self.position_encode:
             k = 3
@@ -171,7 +179,9 @@ class CBAM_Module(nn.Module):
             if self.position_encoded is None:
 
                 pos_enc = get_sinusoid_encoding_table(h, w)
-                pos_enc = Variable(torch.FloatTensor(pos_enc), requires_grad=False)
+                pos_enc = Variable(
+                    torch.FloatTensor(pos_enc), requires_grad=False
+                )
                 if x.is_cuda:
                     pos_enc = pos_enc.cuda()
                 self.position_encoded = pos_enc
@@ -198,7 +208,9 @@ def init_layer(layer):
 
 
 class AttBlockV2(nn.Module):
-    def __init__(self, in_features: int, out_features: int, activation="linear"):
+    def __init__(
+        self, in_features: int, out_features: int, activation="linear"
+    ):
         super().__init__()
 
         self.activation = activation

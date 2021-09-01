@@ -48,7 +48,9 @@ class DropStripes(nn.Module):
 
         for _ in range(self.stripes_num):
             distance = torch.randint(low=0, high=self.drop_width, size=(1,))[0]
-            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[0]
+            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[
+                0
+            ]
 
             if self.dim == 2:
                 e[:, bgn : bgn + distance, :] = 0
@@ -62,15 +64,19 @@ class MixStripes(DropStripes):
 
         for _ in range(self.stripes_num):
             distance = torch.randint(low=0, high=self.drop_width, size=(1,))[0]
-            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[0]
+            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[
+                0
+            ]
 
             if self.dim == 2:
                 e[:, bgn : bgn + distance, :] = (
-                    e[:, bgn : bgn + distance, :] + s[:, bgn : bgn + distance, :]
+                    e[:, bgn : bgn + distance, :]
+                    + s[:, bgn : bgn + distance, :]
                 ) / 2
             elif self.dim == 3:
                 e[:, :, bgn : bgn + distance] = (
-                    e[:, :, bgn : bgn + distance] + s[:, :, bgn : bgn + distance]
+                    e[:, :, bgn : bgn + distance]
+                    + s[:, :, bgn : bgn + distance]
                 ) / 2
 
 
@@ -80,7 +86,9 @@ class CutStripes(DropStripes):
 
         for _ in range(self.stripes_num):
             distance = torch.randint(low=0, high=self.drop_width, size=(1,))[0]
-            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[0]
+            bgn = torch.randint(low=0, high=total_width - distance, size=(1,))[
+                0
+            ]
 
             if self.dim == 2:
                 e[:, bgn : bgn + distance, :] = s[:, bgn : bgn + distance, :]
@@ -137,7 +145,10 @@ if __name__ == "__main__":
     pt_data = torch.Tensor(np_data)
 
     spec_augmenter = SpecAugmentationPlusPlus(
-        time_drop_width=64, time_stripes_num=2, freq_drop_width=16, freq_stripes_num=2
+        time_drop_width=64,
+        time_stripes_num=2,
+        freq_drop_width=16,
+        freq_stripes_num=2,
     )
 
     # Training stage

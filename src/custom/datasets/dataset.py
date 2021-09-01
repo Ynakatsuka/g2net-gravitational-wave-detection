@@ -12,7 +12,9 @@ def whiten(signal):
     spec = torch.fft.fft(torch.from_numpy(signal).float() * hann)
     mag = torch.sqrt(torch.real(spec * torch.conj(spec)))
 
-    return torch.real(torch.fft.ifft(spec / mag)).numpy() * np.sqrt(len(signal) / 2)
+    return torch.real(torch.fft.ifft(spec / mag)).numpy() * np.sqrt(
+        len(signal) / 2
+    )
 
 
 @kvt.DATASETS.register
@@ -101,7 +103,12 @@ class G2NetDataset(BaseDataset):
     def _extract_path_to_input_from_input_column(self, df):
         inputs = df[self.input_column].apply(
             lambda x: os.path.join(
-                self.input_dir, self.images_dir, x[0], x[1], x[2], x + self.extension,
+                self.input_dir,
+                self.images_dir,
+                x[0],
+                x[1],
+                x[2],
+                x + self.extension,
             )
         )
         if self.test_images_dir is not None:
@@ -139,7 +146,9 @@ class G2NetDataset(BaseDataset):
         elif self.normalize_mode == 1:
             return (x - x.mean()) / x.std()
         elif self.normalize_mode == 2:
-            return (x - x.mean(axis=1).reshape(-1, 1)) / x.std(axis=1).reshape(-1, 1)
+            return (x - x.mean(axis=1).reshape(-1, 1)) / x.std(axis=1).reshape(
+                -1, 1
+            )
         elif self.normalize_mode == 3:
             return x / 4.6152116e-20
         elif self.normalize_mode == 4:
@@ -147,15 +156,25 @@ class G2NetDataset(BaseDataset):
         elif self.normalize_mode == 5:
             return (x - 4.3110074e-26) / 6.1481726e-21
         elif self.normalize_mode == 6:
-            max_ = np.array([[4.6152116e-20], [4.1438353e-20], [1.1161064e-20]])
+            max_ = np.array(
+                [[4.6152116e-20], [4.1438353e-20], [1.1161064e-20]]
+            )
             return x / max_
         elif self.normalize_mode == 7:
-            max_ = np.array([[4.6152116e-20], [4.1438353e-20], [1.1161064e-20]])
-            min_ = np.array([[-4.4294355e-20], [-4.2303907e-20], [-1.0863199e-20]])
+            max_ = np.array(
+                [[4.6152116e-20], [4.1438353e-20], [1.1161064e-20]]
+            )
+            min_ = np.array(
+                [[-4.4294355e-20], [-4.2303907e-20], [-1.0863199e-20]]
+            )
             return ((x - min_) / max_ - 0.5) * 2
         elif self.normalize_mode == 8:
-            mean_ = np.array([[5.3645219e-27], [1.2159634e-25], [2.3708171e-27]])
-            std_ = np.array([[7.4209854e-21], [7.4192858e-21], [1.8380779e-21]])
+            mean_ = np.array(
+                [[5.3645219e-27], [1.2159634e-25], [2.3708171e-27]]
+            )
+            std_ = np.array(
+                [[7.4209854e-21], [7.4192858e-21], [1.8380779e-21]]
+            )
             return (x - mean_) / std_
         elif self.normalize_mode == 9:
             return (x - 5.1104632e-27) / 6.150679e-21
@@ -165,7 +184,10 @@ class G2NetDataset(BaseDataset):
             x -= x.min() + 1e-07
             x /= x.max()
             x = np.concatenate(
-                [np.expand_dims(stats.boxcox(x[i])[0], axis=0) for i in range(3)]
+                [
+                    np.expand_dims(stats.boxcox(x[i])[0], axis=0)
+                    for i in range(3)
+                ]
             )
             return x
         else:
@@ -181,7 +203,9 @@ class G2NetDataset(BaseDataset):
                 ]
             )
         # bandpass
-        waves = np.array([signal.filtfilt(self.b, self.a, wave) for wave in waves])
+        waves = np.array(
+            [signal.filtfilt(self.b, self.a, wave) for wave in waves]
+        )
         return waves
 
     def __getitem__(self, idx):
@@ -194,12 +218,16 @@ class G2NetDataset(BaseDataset):
         x = self._preprocess_input(x)
 
         if self.apply_whiten:
-            x = np.concatenate([np.expand_dims(whiten(x[i]), axis=0) for i in range(3)])
+            x = np.concatenate(
+                [np.expand_dims(whiten(x[i]), axis=0) for i in range(3)]
+            )
 
         if self.transform is not None:
             x = np.concatenate(
                 [
-                    np.expand_dims(self.transform(x[i], self.sample_rate), axis=0)
+                    np.expand_dims(
+                        self.transform(x[i], self.sample_rate), axis=0
+                    )
                     for i in range(3)
                 ]
             )

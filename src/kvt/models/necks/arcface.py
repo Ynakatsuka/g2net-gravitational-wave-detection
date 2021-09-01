@@ -47,7 +47,9 @@ class MagrginLinear(nn.Module):
 
         cond_v = cos_theta - self.threshold
         cond_mask = cond_v <= 0
-        keep_val = cos_theta - self.mm  # when theta not in [0,pi], use cosface instead
+        keep_val = (
+            cos_theta - self.mm
+        )  # when theta not in [0,pi], use cosface instead
         cos_theta_m[cond_mask] = keep_val[cond_mask]
         output = (
             cos_theta * 1.0
@@ -66,7 +68,9 @@ class MagrginLinear(nn.Module):
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features):
         super().__init__()
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+        self.weight = nn.Parameter(
+            torch.FloatTensor(out_features, in_features)
+        )
         self.reset_parameters()
 
     def reset_parameters(self):

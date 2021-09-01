@@ -259,7 +259,9 @@ class Solarize(A.ImageOnlyTransform):
     def apply(self, image, **params):
         threshold = 256 - int_parameter(self.mag, 256)
         image = PIL.Image.fromarray(image, mode="RGB")
-        return np.asarray(PIL.ImageOps.solarize(image, threshold), dtype=np.uint8)
+        return np.asarray(
+            PIL.ImageOps.solarize(image, threshold), dtype=np.uint8
+        )
 
 
 class Posterize(A.ImageOnlyTransform):
@@ -301,7 +303,9 @@ class Color(A.ImageOnlyTransform):
     def apply(self, image, **params):
         factor = 1 + float_parameter(self.mag, 0.9, flip_sign=True)
         image = PIL.Image.fromarray(image, mode="RGB")
-        return np.asarray(PIL.ImageEnhance.Color(image).enhance(factor), dtype=np.uint8)
+        return np.asarray(
+            PIL.ImageEnhance.Color(image).enhance(factor), dtype=np.uint8
+        )
 
 
 class Brightness(A.ImageOnlyTransform):
@@ -334,7 +338,9 @@ class Sharpness(A.ImageOnlyTransform):
         )
 
 
-def float_parameter(level: int, maxval: float, flip_sign: bool = False) -> float:
+def float_parameter(
+    level: int, maxval: float, flip_sign: bool = False
+) -> float:
     """0～maxvalへの変換。"""
     assert 0 <= level <= 9
     value = float(level) * maxval / 9

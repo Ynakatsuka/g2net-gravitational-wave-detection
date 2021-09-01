@@ -26,7 +26,9 @@ class DINOLoss(nn.Module):
         self.teacher_temp_schedule = np.concatenate(
             (
                 np.linspace(
-                    warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs
+                    warmup_teacher_temp,
+                    teacher_temp,
+                    warmup_teacher_temp_epochs,
                 ),
                 np.ones(nepochs - warmup_teacher_temp_epochs) * teacher_temp,
             )
@@ -51,7 +53,9 @@ class DINOLoss(nn.Module):
                 if v == iq:
                     # we skip cases where student and teacher operate on the same view
                     continue
-                loss = torch.sum(-q * F.log_softmax(student_out[v], dim=-1), dim=-1)
+                loss = torch.sum(
+                    -q * F.log_softmax(student_out[v], dim=-1), dim=-1
+                )
                 total_loss += loss.mean()
                 n_loss_terms += 1
         total_loss /= n_loss_terms
@@ -97,7 +101,9 @@ class DDINOLoss(nn.Module):
         self.teacher_temp_schedule = np.concatenate(
             (
                 np.linspace(
-                    warmup_teacher_temp, teacher_temp, warmup_teacher_temp_epochs
+                    warmup_teacher_temp,
+                    teacher_temp,
+                    warmup_teacher_temp_epochs,
                 ),
                 np.ones(nepochs - warmup_teacher_temp_epochs) * teacher_temp,
             )
@@ -144,7 +150,9 @@ class DDINOLoss(nn.Module):
                     continue
 
                 # view level prediction loss
-                loss = 0.5 * torch.sum(-q * F.log_softmax(s_cls[v], dim=-1), dim=-1)
+                loss = 0.5 * torch.sum(
+                    -q * F.log_softmax(s_cls[v], dim=-1), dim=-1
+                )
 
                 # region level prediction loss
                 s_region_cur, s_fea_cur = (
@@ -168,11 +176,14 @@ class DDINOLoss(nn.Module):
                 t_indexed_region = torch.gather(
                     t_region_cur,
                     1,
-                    region_sim_ind.unsqueeze(2).expand(-1, -1, t_region_cur.size(2)),
+                    region_sim_ind.unsqueeze(2).expand(
+                        -1, -1, t_region_cur.size(2)
+                    ),
                 )  # B x T_s x K (index matrix: B, T_s, 1)
 
                 loss_grid = torch.sum(
-                    -t_indexed_region * F.log_softmax(s_region_cur, dim=-1), dim=[-1]
+                    -t_indexed_region * F.log_softmax(s_region_cur, dim=-1),
+                    dim=[-1],
                 ).mean(
                     -1
                 )  # B x T_s x K --> B
@@ -199,9 +210,9 @@ class DDINOLoss(nn.Module):
         )
 
         # region level center update
-        batch_grid_center = torch.sum(teacher_grid_output, dim=0, keepdim=True) / len(
-            teacher_grid_output
-        )
+        batch_grid_center = torch.sum(
+            teacher_grid_output, dim=0, keepdim=True
+        ) / len(teacher_grid_output)
 
         # ema update
         self.center = self.center * self.center_momentum + batch_center * (

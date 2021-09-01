@@ -68,7 +68,9 @@ class AGC(torch.optim.Optimizer):
             for module_name in ignore_agc:
                 if module_name not in names:
                     raise ModuleNotFoundError(
-                        "Module name {} not found in the model".format(module_name)
+                        "Module name {} not found in the model".format(
+                            module_name
+                        )
                     )
             parameters = [
                 {"params": module.parameters()}
@@ -95,7 +97,8 @@ class AGC(torch.optim.Optimizer):
                 if p.grad is None:
                     continue
                 param_norm = torch.max(
-                    unitwise_norm(p.detach()), torch.tensor(group["eps"]).to(p.device)
+                    unitwise_norm(p.detach()),
+                    torch.tensor(group["eps"]).to(p.device),
                 )
                 grad_norm = unitwise_norm(p.grad.detach())
                 max_norm = param_norm * group["clipping"]
@@ -104,7 +107,9 @@ class AGC(torch.optim.Optimizer):
 
                 clipped_grad = p.grad * (
                     max_norm
-                    / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
+                    / torch.max(
+                        grad_norm, torch.tensor(1e-6).to(grad_norm.device)
+                    )
                 )
                 p.grad.data.copy_(torch.where(trigger, clipped_grad, p.grad))
 
@@ -171,7 +176,9 @@ class SGD_AGC(torch.optim.Optimizer):
         if momentum < 0.0:
             raise ValueError("Invalid momentum value: {}".format(momentum))
         if weight_decay < 0.0:
-            raise ValueError("Invalid weight_decay value: {}".format(weight_decay))
+            raise ValueError(
+                "Invalid weight_decay value: {}".format(weight_decay)
+            )
         if clipping < 0.0:
             raise ValueError("Invalid clipping value: {}".format(clipping))
         if eps < 0.0:
@@ -187,7 +194,9 @@ class SGD_AGC(torch.optim.Optimizer):
             eps=eps,
         )
         if nesterov and (momentum <= 0 or dampening != 0):
-            raise ValueError("Nesterov momentum requires a momentum and zero dampening")
+            raise ValueError(
+                "Nesterov momentum requires a momentum and zero dampening"
+            )
         super(SGD_AGC, self).__init__(params, defaults)
 
     def __setstate__(self, state):
@@ -212,7 +221,8 @@ class SGD_AGC(torch.optim.Optimizer):
                 if p.grad is None:
                     continue
                 param_norm = torch.max(
-                    unitwise_norm(p.detach()), torch.tensor(group["eps"]).to(p.device)
+                    unitwise_norm(p.detach()),
+                    torch.tensor(group["eps"]).to(p.device),
                 )
                 grad_norm = unitwise_norm(p.grad.detach())
                 max_norm = param_norm * group["clipping"]
@@ -221,7 +231,9 @@ class SGD_AGC(torch.optim.Optimizer):
 
                 clipped_grad = p.grad * (
                     max_norm
-                    / torch.max(grad_norm, torch.tensor(1e-6).to(grad_norm.device))
+                    / torch.max(
+                        grad_norm, torch.tensor(1e-6).to(grad_norm.device)
+                    )
                 )
                 p.grad.data.copy_(torch.where(trigger, clipped_grad, p.grad))
 
@@ -240,7 +252,9 @@ class SGD_AGC(torch.optim.Optimizer):
                 if momentum != 0:
                     param_state = self.state[p]
                     if "momentum_buffer" not in param_state:
-                        buf = param_state["momentum_buffer"] = torch.clone(d_p).detach()
+                        buf = param_state["momentum_buffer"] = torch.clone(
+                            d_p
+                        ).detach()
                     else:
                         buf = param_state["momentum_buffer"]
                         buf.mul_(momentum).add_(d_p, alpha=1 - dampening)

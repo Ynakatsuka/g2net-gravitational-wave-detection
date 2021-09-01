@@ -138,14 +138,20 @@ class G2Net(nn.Module):
         self.backbone = backbone
 
     def forward(
-        self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False
+        self,
+        input,
+        mixup_lambda=None,
+        mixup_index=None,
+        return_spectrogram=False,
     ):
         if self.spectrogram_extractor is not None:
             # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
             # e.g., [256, 3, 54, 129]
             x = []
             for i in range(input.shape[1]):
-                x.append(self.spectrogram_extractor(input[:, i, :]).unsqueeze(1))
+                x.append(
+                    self.spectrogram_extractor(input[:, i, :]).unsqueeze(1)
+                )
             x = torch.cat(x, dim=1)
         else:
             x = input
@@ -169,7 +175,9 @@ class G2Net(nn.Module):
             idx = torch.randperm(x.shape[3])
             x = x[:, :, :, idx]
 
-        if (self.training or self.apply_tta) and (self.spec_augmenter is not None):
+        if (self.training or self.apply_tta) and (
+            self.spec_augmenter is not None
+        ):
             x = x.transpose(2, 3).contiguous()
             x = self.spec_augmenter(x)
             x = x.transpose(2, 3).contiguous()
@@ -275,13 +283,19 @@ class AttentionG2Net(G2Net):
         self.pooling_kernel_size = pooling_kernel_size
 
         self.fc1 = nn.Linear(in_features, in_features, bias=True)
-        self.att_block = AttBlockV2(in_features, num_classes, activation="sigmoid")
+        self.att_block = AttBlockV2(
+            in_features, num_classes, activation="sigmoid"
+        )
 
         if self.use_gru_layer:
             self.gru = nn.GRU(in_features, in_features, batch_first=True)
 
     def forward(
-        self, input, mixup_lambda=None, mixup_index=None, return_spectrogram=False
+        self,
+        input,
+        mixup_lambda=None,
+        mixup_index=None,
+        return_spectrogram=False,
     ):
         # (batch_size, 3, time_steps) -> (batch_size, 3, freq_bins, time_steps)
         x = []
@@ -303,7 +317,9 @@ class AttentionG2Net(G2Net):
             idx = torch.randperm(x.shape[3])
             x = x[:, :, :, idx]
 
-        if (self.training or self.apply_tta) and (self.spec_augmenter is not None):
+        if (self.training or self.apply_tta) and (
+            self.spec_augmenter is not None
+        ):
             x = self.spec_augmenter(x)
 
         # Mixup on spectrogram
@@ -342,7 +358,9 @@ class AttentionG2Net(G2Net):
 
 
 class PositionalEncoding(nn.Module):
-    def __init__(self, d_model: int, dropout: float = 0.1, max_len: int = 5000):
+    def __init__(
+        self, d_model: int, dropout: float = 0.1, max_len: int = 5000
+    ):
         super().__init__()
         self.dropout = nn.Dropout(p=dropout)
 

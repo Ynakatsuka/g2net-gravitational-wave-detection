@@ -27,7 +27,10 @@ class CWT(nn.Module):
         # https://github.com/scipy/scipy/blob/v1.7.1/scipy/signal/wavelets.py#L262-L306
         A = 2 / (np.sqrt(3 * a) * (np.pi ** 0.25))
         wsq = a ** 2
-        vec = torch.arange(0, points, dtype=dtype).to(device) - (points - 1.0) / 2
+        vec = (
+            torch.arange(0, points, dtype=dtype).to(device)
+            - (points - 1.0) / 2
+        )
         xsq = vec ** 2
         mod = 1 - xsq / wsq
         gauss = torch.exp(-xsq / (2 * wsq))
@@ -35,7 +38,10 @@ class CWT(nn.Module):
         return total
 
     def morlet(self, points, s, dtype=None, device="cpu"):
-        x = torch.arange(0, points, dtype=dtype).to(device) - (points - 1.0) / 2
+        x = (
+            torch.arange(0, points, dtype=dtype).to(device)
+            - (points - 1.0) / 2
+        )
         x = x / s
         # https://uk.mathworks.com/help/wavelet/ref/morlet.html
         wavelet = torch.exp(-(x ** 2.0) / 2.0) * torch.cos(5.0 * x)

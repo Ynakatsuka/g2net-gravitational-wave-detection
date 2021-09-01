@@ -5,7 +5,14 @@ from torch import nn
 
 class DeformConv2d(nn.Module):
     def __init__(
-        self, inc, outc, kernel_size=3, padding=1, stride=1, bias=None, modulation=False
+        self,
+        inc,
+        outc,
+        kernel_size=3,
+        padding=1,
+        stride=1,
+        bias=None,
+        modulation=False,
     ):
         """
         Args:
@@ -21,7 +28,11 @@ class DeformConv2d(nn.Module):
         )
 
         self.p_conv = nn.Conv2d(
-            inc, 2 * kernel_size * kernel_size, kernel_size=3, padding=1, stride=stride
+            inc,
+            2 * kernel_size * kernel_size,
+            kernel_size=3,
+            padding=1,
+            stride=stride,
         )
         nn.init.constant_(self.p_conv.weight, 0)
         self.p_conv.register_backward_hook(self._set_lr)
@@ -29,7 +40,11 @@ class DeformConv2d(nn.Module):
         self.modulation = modulation
         if modulation:
             self.m_conv = nn.Conv2d(
-                inc, kernel_size * kernel_size, kernel_size=3, padding=1, stride=stride
+                inc,
+                kernel_size * kernel_size,
+                kernel_size=3,
+                padding=1,
+                stride=stride,
             )
             nn.init.constant_(self.m_conv.weight, 0)
             self.m_conv.register_backward_hook(self._set_lr)
@@ -127,8 +142,12 @@ class DeformConv2d(nn.Module):
 
     def _get_p_n(self, N, dtype):
         p_n_x, p_n_y = torch.meshgrid(
-            torch.arange(-(self.kernel_size - 1) // 2, (self.kernel_size - 1) // 2 + 1),
-            torch.arange(-(self.kernel_size - 1) // 2, (self.kernel_size - 1) // 2 + 1),
+            torch.arange(
+                -(self.kernel_size - 1) // 2, (self.kernel_size - 1) // 2 + 1
+            ),
+            torch.arange(
+                -(self.kernel_size - 1) // 2, (self.kernel_size - 1) // 2 + 1
+            ),
         )
         # (2N, 1)
         p_n = torch.cat([torch.flatten(p_n_x), torch.flatten(p_n_y)], 0)
@@ -175,7 +194,9 @@ class DeformConv2d(nn.Module):
             .view(b, c, -1)
         )
 
-        x_offset = x.gather(dim=-1, index=index).contiguous().view(b, c, h, w, N)
+        x_offset = (
+            x.gather(dim=-1, index=index).contiguous().view(b, c, h, w, N)
+        )
 
         return x_offset
 

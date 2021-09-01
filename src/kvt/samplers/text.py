@@ -19,7 +19,9 @@ def prepare_buckets(lens, bucket_size, batch_size, shuffle=True, indices=None):
     assert bucket_size % batch_size == 0 or bucket_size == len(lens)
     if indices is None:
         if shuffle:
-            indices = sklearn.utils.shuffle(np.arange(len(lens), dtype=np.int32))
+            indices = sklearn.utils.shuffle(
+                np.arange(len(lens), dtype=np.int32)
+            )
             lens = lens[indices]
         else:
             indices = np.arange(len(lens), dtype=np.int32)

@@ -12,7 +12,12 @@ class Conv3x3GNReLU(nn.Module):
         self.upsample = upsample
         self.block = nn.Sequential(
             nn.Conv2d(
-                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
+                in_channels,
+                out_channels,
+                (3, 3),
+                stride=1,
+                padding=1,
+                bias=False,
             ),
             nn.GroupNorm(32, out_channels),
             nn.ReLU(inplace=True),
@@ -21,14 +26,18 @@ class Conv3x3GNReLU(nn.Module):
     def forward(self, x):
         x = self.block(x)
         if self.upsample:
-            x = F.interpolate(x, scale_factor=2, mode="bilinear", align_corners=True)
+            x = F.interpolate(
+                x, scale_factor=2, mode="bilinear", align_corners=True
+            )
         return x
 
 
 class FPNBlock(nn.Module):
     def __init__(self, pyramid_channels, skip_channels):
         super().__init__()
-        self.skip_conv = nn.Conv2d(skip_channels, pyramid_channels, kernel_size=1)
+        self.skip_conv = nn.Conv2d(
+            skip_channels, pyramid_channels, kernel_size=1
+        )
 
     def forward(self, x):
         x, skip = x
@@ -44,11 +53,17 @@ class SegmentationBlock(nn.Module):
     def __init__(self, in_channels, out_channels, n_upsamples=0):
         super().__init__()
 
-        blocks = [Conv3x3GNReLU(in_channels, out_channels, upsample=bool(n_upsamples))]
+        blocks = [
+            Conv3x3GNReLU(
+                in_channels, out_channels, upsample=bool(n_upsamples)
+            )
+        ]
 
         if n_upsamples > 1:
             for _ in range(1, n_upsamples):
-                blocks.append(Conv3x3GNReLU(out_channels, out_channels, upsample=True))
+                blocks.append(
+                    Conv3x3GNReLU(out_channels, out_channels, upsample=True)
+                )
 
         self.block = nn.Sequential(*blocks)
 
@@ -77,7 +92,9 @@ class Decoder(nn.Module):
         print("[Decoder::__init__] encoder_channels:", encoder_channels)
 
         self.final_upsampling = final_upsampling
-        self.conv1 = nn.Conv2d(in_channels[0], pyramid_channels, kernel_size=(1, 1))
+        self.conv1 = nn.Conv2d(
+            in_channels[0], pyramid_channels, kernel_size=(1, 1)
+        )
 
         self.p4 = FPNBlock(pyramid_channels, in_channels[1])
         self.p3 = FPNBlock(pyramid_channels, in_channels[2])
@@ -173,7 +190,9 @@ class Decoder(nn.Module):
     def initialize(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_uniform_(m.weight, mode="fan_in", nonlinearity="relu")
+                nn.init.kaiming_uniform_(
+                    m.weight, mode="fan_in", nonlinearity="relu"
+                )
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
             elif isinstance(m, nn.BatchNorm2d):
@@ -186,7 +205,9 @@ class FPN(nn.Module):
         super().__init__()
         self.encoder = build_encoder(encoder)
         self.decoder = Decoder(
-            num_classes=num_classes, encoder_channels=self.encoder.channels, **kwargs
+            num_classes=num_classes,
+            encoder_channels=self.encoder.channels,
+            **kwargs,
         )
 
     def forward(self, x):

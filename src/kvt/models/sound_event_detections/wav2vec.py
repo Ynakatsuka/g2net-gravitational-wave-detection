@@ -10,7 +10,9 @@ except ImportError:
 
 
 class Wav2VecSequenceClassification(nn.Module):
-    def __init__(self, wave2vec_model_name=None, hidden_size=768, num_classes=397):
+    def __init__(
+        self, wave2vec_model_name=None, hidden_size=768, num_classes=397
+    ):
         super().__init__()
 
         self.wav2vec2 = Wav2Vec2Model.from_pretrained(wave2vec_model_name)

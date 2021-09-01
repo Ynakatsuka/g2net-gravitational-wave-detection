@@ -32,7 +32,13 @@ class GridMask(DualTransform):
     """
 
     def __init__(
-        self, num_grid=3, fill_value=0, rotate=0, mode=0, always_apply=False, p=0.5
+        self,
+        num_grid=3,
+        fill_value=0,
+        rotate=0,
+        mode=0,
+        always_apply=False,
+        p=0.5,
     ):
         super(GridMask, self).__init__(always_apply, p)
         if isinstance(num_grid, int):
@@ -50,7 +56,9 @@ class GridMask(DualTransform):
     def init_masks(self, height, width):
         if self.masks is None:
             self.masks = []
-            for n, n_g in enumerate(range(self.num_grid[0], self.num_grid[1] + 1, 1)):
+            for n, n_g in enumerate(
+                range(self.num_grid[0], self.num_grid[1] + 1, 1)
+            ):
                 grid_h = height / n_g
                 grid_w = width / n_g
                 this_mask = np.ones(
@@ -64,8 +72,12 @@ class GridMask(DualTransform):
                         ] = self.fill_value
                         if self.mode == 2:
                             this_mask[
-                                int(i * grid_h + grid_h / 2) : int(i * grid_h + grid_h),
-                                int(j * grid_w + grid_w / 2) : int(j * grid_w + grid_w),
+                                int(i * grid_h + grid_h / 2) : int(
+                                    i * grid_h + grid_h
+                                ),
+                                int(j * grid_w + grid_w / 2) : int(
+                                    j * grid_w + grid_w
+                                ),
                             ] = self.fill_value
 
                 if self.mode == 1:
@@ -79,7 +91,9 @@ class GridMask(DualTransform):
         h, w = image.shape[:2]
         mask = F.rotate(mask, angle) if self.rotate[1] > 0 else mask
         mask = mask[:, :, np.newaxis] if image.ndim == 3 else mask
-        image *= mask[rand_h : rand_h + h, rand_w : rand_w + w].astype(image.dtype)
+        image *= mask[rand_h : rand_h + h, rand_w : rand_w + w].astype(
+            image.dtype
+        )
         return image
 
     def get_params_dependent_on_targets(self, params):
@@ -97,7 +111,12 @@ class GridMask(DualTransform):
             else 0
         )
 
-        return {"mask": mask, "rand_h": rand_h, "rand_w": rand_w, "angle": angle}
+        return {
+            "mask": mask,
+            "rand_h": rand_h,
+            "rand_w": rand_w,
+            "angle": angle,
+        }
 
     @property
     def targets_as_params(self):

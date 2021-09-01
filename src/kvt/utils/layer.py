@@ -9,7 +9,13 @@ from kvt.models.heads import (
     SphereProduct,
 )
 from kvt.models.layers import Flatten, Identity, SEBlock
-from kvt.models.necks import RMAC, AdaptiveConcatPool2d, GeM, Rpool, TripletAttention
+from kvt.models.necks import (
+    RMAC,
+    AdaptiveConcatPool2d,
+    GeM,
+    Rpool,
+    TripletAttention,
+)
 from kvt.models.wrappers import MetricLearningModelWrapper
 
 
@@ -73,7 +79,9 @@ def replace_last_linear(
         raise ValueError(f"Invalid last linear type: {last_linear_type}")
 
     # replace pooling
-    def replace_pooling_layer(original, layer_name, apply_triplet_attention=False):
+    def replace_pooling_layer(
+        original, layer_name, apply_triplet_attention=False
+    ):
         neck = []
 
         if apply_triplet_attention:
@@ -140,12 +148,19 @@ def replace_last_linear(
         if last_linear_type == "multi_sample_dropout":
             last_layers.append(
                 MultiSampleDropout(
-                    in_features, num_classes, multi_sample_dropout_p, n_multi_samples
+                    in_features,
+                    num_classes,
+                    multi_sample_dropout_p,
+                    n_multi_samples,
                 )
             )
-        elif (last_linear_type == "multi_head") and (num_classes_list is not None):
+        elif (last_linear_type == "multi_head") and (
+            num_classes_list is not None
+        ):
             last_layers.append(
-                MultiHead(in_features, num_classes_list, head_names, dropout_rate)
+                MultiHead(
+                    in_features, num_classes_list, head_names, dropout_rate
+                )
             )
         elif last_linear_type == "linear":
             last_layers.extend(

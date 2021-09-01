@@ -19,7 +19,9 @@ def main(config: DictConfig) -> None:
     config = update_experiment_name(config)
 
     print("-" * 100)
-    pprint.PrettyPrinter(indent=2).pprint(OmegaConf.to_container(config, resolve=True))
+    pprint.PrettyPrinter(indent=2).pprint(
+        OmegaConf.to_container(config, resolve=True)
+    )
 
     # variables
     sample_submission_path = config.competition.sample_submission_path
@@ -27,7 +29,9 @@ def main(config: DictConfig) -> None:
 
     # load
     sub = pd.read_csv(sample_submission_path)
-    load_oof_paths = sorted(glob.glob(f"{config.trainer.inference.dirpath}/*.npy"))
+    load_oof_paths = sorted(
+        glob.glob(f"{config.trainer.inference.dirpath}/*.npy")
+    )
     assert len(load_oof_paths) > 0
     if len(load_oof_paths) == 1:
         preds = np.load(load_oof_paths[0])
@@ -45,7 +49,9 @@ def main(config: DictConfig) -> None:
     dirpath = os.path.join(config.save_dir, "submission")
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
-    sub.to_csv(os.path.join(dirpath, f"{config.experiment_name}.csv"), index=False)
+    sub.to_csv(
+        os.path.join(dirpath, f"{config.experiment_name}.csv"), index=False
+    )
 
 
 if __name__ == "__main__":

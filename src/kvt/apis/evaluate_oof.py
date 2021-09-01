@@ -27,7 +27,9 @@ def run(config):
     y_train = train[target_column]
 
     # load oof predictions
-    load_oof_paths = sorted(glob.glob(f"{config.trainer.evaluation.dirpath}/*.npy"))
+    load_oof_paths = sorted(
+        glob.glob(f"{config.trainer.evaluation.dirpath}/*.npy")
+    )
     assert len(load_oof_paths) == num_fold
 
     y_pred = np.zeros_like(y_train, dtype=float)
@@ -39,8 +41,11 @@ def run(config):
         y_pred[valid_idx] = loaded_object
 
     if hasattr(
-        config.lightning_module.lightning_module.params, "enable_numpy_evaluation"
-    ) and (not config.lightning_module.lightning_module.params.enable_numpy_evaluation):
+        config.lightning_module.lightning_module.params,
+        "enable_numpy_evaluation",
+    ) and (
+        not config.lightning_module.lightning_module.params.enable_numpy_evaluation
+    ):
         y_train = torch.tensor(y_train)
         y_pred = torch.tensor(y_pred)
 
@@ -51,7 +56,9 @@ def run(config):
 
         for fold in range(num_fold):
             valid_idx = train[fold_column] == fold
-            results[f"{key}_fold_{fold}"] = fn(y_pred[valid_idx], y_train[valid_idx])
+            results[f"{key}_fold_{fold}"] = fn(
+                y_pred[valid_idx], y_train[valid_idx]
+            )
 
     if hasattr(logger, "log_metrics"):
         logger.log_metrics(results)

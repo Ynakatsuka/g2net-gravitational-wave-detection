@@ -7,7 +7,12 @@ from albumentations.core.transforms_interface import ImageOnlyTransform
 
 class RandomMorph(ImageOnlyTransform):
     def __init__(
-        self, _min=2, _max=6, element_shape=cv2.MORPH_ELLIPSE, always_apply=False, p=0.5
+        self,
+        _min=2,
+        _max=6,
+        element_shape=cv2.MORPH_ELLIPSE,
+        always_apply=False,
+        p=0.5,
     ):
         super().__init__(always_apply, p)
         self._min = _min

@@ -14,7 +14,10 @@ def hard_sample_roc_auc_score(pred, target, threshold=0.01):
     fold["pred"] = 0
     for i, path in enumerate(paths):
         fold.loc[fold.Fold == i, "pred"] = np.load(path)
-        if np.mean((fold.loc[fold.Fold == i, "target"].values - target) ** 2) <= 0.0001:
+        if (
+            np.mean((fold.loc[fold.Fold == i, "target"].values - target) ** 2)
+            <= 0.0001
+        ):
             idx = fold.Fold == i
     fold["deviation"] = (fold["target"] - fold["pred"]) ** 2
     idx &= fold["deviation"] > threshold

@@ -21,7 +21,9 @@ class AdaptiveConcatPool2d(nn.Module):
 
 
 def gem(x, p=3, eps=1e-6):
-    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(1.0 / p)
+    return F.avg_pool2d(x.clamp(min=eps).pow(p), (x.size(-2), x.size(-1))).pow(
+        1.0 / p
+    )
 
 
 def gem1d(x, p=3, eps=1e-6):
@@ -82,7 +84,9 @@ class GeMPool1d(nn.Module):
 
 def rmac(x, L=3, eps=1e-6):
     ovr = 0.4  # desired overlap of neighboring regions
-    steps = torch.Tensor([2, 3, 4, 5, 6, 7])  # possible regions for the long dimension
+    steps = torch.Tensor(
+        [2, 3, 4, 5, 6, 7]
+    )  # possible regions for the long dimension
 
     W = x.size(3)
     H = x.size(2)
@@ -129,10 +133,22 @@ def rmac(x, L=3, eps=1e-6):
             for j_ in cenW.tolist():
                 if wl == 0:
                     continue
-                R = x[:, :, (int(i_) + torch.Tensor(range(wl)).long()).tolist(), :]
-                R = R[:, :, :, (int(j_) + torch.Tensor(range(wl)).long()).tolist()]
+                R = x[
+                    :,
+                    :,
+                    (int(i_) + torch.Tensor(range(wl)).long()).tolist(),
+                    :,
+                ]
+                R = R[
+                    :,
+                    :,
+                    :,
+                    (int(j_) + torch.Tensor(range(wl)).long()).tolist(),
+                ]
                 vt = F.max_pool2d(R, (R.size(-2), R.size(-1)))
-                vt = vt / (torch.norm(vt, p=2, dim=1, keepdim=True) + eps).expand_as(vt)
+                vt = vt / (
+                    torch.norm(vt, p=2, dim=1, keepdim=True) + eps
+                ).expand_as(vt)
                 v += vt
 
     return v
@@ -153,7 +169,9 @@ class RMAC(nn.Module):
 
 def roipool(x, rpool, L=3, eps=1e-6):
     ovr = 0.4  # desired overlap of neighboring regions
-    steps = torch.Tensor([2, 3, 4, 5, 6, 7])  # possible regions for the long dimension
+    steps = torch.Tensor(
+        [2, 3, 4, 5, 6, 7]
+    )  # possible regions for the long dimension
 
     W = x.size(3)
     H = x.size(2)
@@ -186,21 +204,25 @@ def roipool(x, rpool, L=3, eps=1e-6):
         else:
             b = (W - wl) / (l + Wd - 1)
         cenW = (
-            torch.floor(wl2 + torch.Tensor(range(l - 1 + Wd + 1)) * b).int() - wl2
+            torch.floor(wl2 + torch.Tensor(range(l - 1 + Wd + 1)) * b).int()
+            - wl2
         )  # center coordinates
         if l + Hd == 1:
             b = 0
         else:
             b = (H - wl) / (l + Hd - 1)
         cenH = (
-            torch.floor(wl2 + torch.Tensor(range(l - 1 + Hd + 1)) * b).int() - wl2
+            torch.floor(wl2 + torch.Tensor(range(l - 1 + Hd + 1)) * b).int()
+            - wl2
         )  # center coordinates
 
         for i_ in cenH.tolist():
             for j_ in cenW.tolist():
                 if wl == 0:
                     continue
-                vecs.append(rpool(x.narrow(2, i_, wl).narrow(3, j_, wl)).unsqueeze(1))
+                vecs.append(
+                    rpool(x.narrow(2, i_, wl).narrow(3, j_, wl)).unsqueeze(1)
+                )
 
     return torch.cat(vecs, dim=1)
 
@@ -232,7 +254,9 @@ class Rpool(nn.Module):
 
     def forward(self, x, aggregate=True):
         # features -> roipool
-        o = roipool(x, self.rpool, self.L, self.eps)  # size: #im, #reg, D, 1, 1
+        o = roipool(
+            x, self.rpool, self.L, self.eps
+        )  # size: #im, #reg, D, 1, 1
 
         # concatenate regions from all images in the batch
         s = o.size()
@@ -256,4 +280,10 @@ class Rpool(nn.Module):
         return o
 
     def __repr__(self):
-        return super(Rpool, self).__repr__() + "(" + "L=" + "{}".format(self.L) + ")"
+        return (
+            super(Rpool, self).__repr__()
+            + "("
+            + "L="
+            + "{}".format(self.L)
+            + ")"
+        )

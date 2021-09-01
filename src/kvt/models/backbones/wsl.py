@@ -10,16 +10,24 @@ def _resnext101_32xxxd_wsl(name, num_classes=1000):
 
 
 def resnext101_32x8d_wsl(num_classes=1000):
-    return _resnext101_32xxxd_wsl("resnext101_32x8d_wsl", num_classes=num_classes)
+    return _resnext101_32xxxd_wsl(
+        "resnext101_32x8d_wsl", num_classes=num_classes
+    )
 
 
 def resnext101_32x16d_wsl(num_classes=1000):
-    return _resnext101_32xxxd_wsl("resnext101_32x16d_wsl", num_classes=num_classes)
+    return _resnext101_32xxxd_wsl(
+        "resnext101_32x16d_wsl", num_classes=num_classes
+    )
 
 
 def resnext101_32x32d_wsl(num_classes=1000):
-    return _resnext101_32xxxd_wsl("resnext101_32x32d_wsl", num_classes=num_classes)
+    return _resnext101_32xxxd_wsl(
+        "resnext101_32x32d_wsl", num_classes=num_classes
+    )
 
 
 def resnext101_32x48d_wsl(num_classes=1000):
-    return _resnext101_32xxxd_wsl("resnext101_32x48d_wsl", num_classes=num_classes)
+    return _resnext101_32xxxd_wsl(
+        "resnext101_32x48d_wsl", num_classes=num_classes
+    )

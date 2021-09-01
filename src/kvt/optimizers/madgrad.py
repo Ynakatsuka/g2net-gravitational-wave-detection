@@ -60,11 +60,15 @@ class MADGRAD(torch.optim.Optimizer):
         if lr <= 0:
             raise ValueError(f"Learning rate {lr} must be positive")
         if weight_decay < 0:
-            raise ValueError(f"Weight decay {weight_decay} must be non-negative")
+            raise ValueError(
+                f"Weight decay {weight_decay} must be non-negative"
+            )
         if eps < 0:
             raise ValueError(f"Eps must be non-negative")
 
-        defaults = dict(lr=lr, eps=eps, momentum=momentum, weight_decay=weight_decay)
+        defaults = dict(
+            lr=lr, eps=eps, momentum=momentum, weight_decay=weight_decay
+        )
         super().__init__(params, defaults)
 
     @property
@@ -75,7 +79,9 @@ class MADGRAD(torch.optim.Optimizer):
     def supports_flat_params(self) -> bool:
         return True
 
-    def step(self, closure: Optional[Callable[[], float]] = None) -> Optional[float]:
+    def step(
+        self, closure: Optional[Callable[[], float]] = None
+    ) -> Optional[float]:
         """Performs a single optimization step.
 
         Arguments:
@@ -139,7 +145,9 @@ class MADGRAD(torch.optim.Optimizer):
                     s_masked = s.sparse_mask(grad)
 
                     # Compute x_0 from other known quantities
-                    rms_masked_vals = grad_sum_sq_masked._values().pow(1 / 3).add_(eps)
+                    rms_masked_vals = (
+                        grad_sum_sq_masked._values().pow(1 / 3).add_(eps)
+                    )
                     x0_masked_vals = p_masked._values().addcdiv(
                         s_masked._values(), rms_masked_vals, value=1
                     )
@@ -149,7 +157,9 @@ class MADGRAD(torch.optim.Optimizer):
                     grad_sum_sq.add_(grad_sq, alpha=lamb)
                     grad_sum_sq_masked.add_(grad_sq, alpha=lamb)
 
-                    rms_masked_vals = grad_sum_sq_masked._values().pow_(1 / 3).add_(eps)
+                    rms_masked_vals = (
+                        grad_sum_sq_masked._values().pow_(1 / 3).add_(eps)
+                    )
 
                     s.add_(grad, alpha=lamb)
                     s_masked._values().add_(grad_val, alpha=lamb)

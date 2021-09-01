@@ -114,7 +114,9 @@ class BaseDataset(torch.utils.data.Dataset):
 
     def _extract_path_to_input_from_input_column(self, df):
         inputs = df[self.input_column].apply(
-            lambda x: os.path.join(self.input_dir, self.images_dir, x + self.extension)
+            lambda x: os.path.join(
+                self.input_dir, self.images_dir, x + self.extension
+            )
         )
         if self.test_images_dir is not None:
             is_test = df["__is_test__"]
@@ -225,7 +227,9 @@ class BaseTextDataset(BaseDataset):
             predictions_dirname_for_pseudo_labeling=predictions_dirname_for_pseudo_labeling,
             test_csv_filename=test_csv_filename,
         )
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=use_fast)
+        self.tokenizer = AutoTokenizer.from_pretrained(
+            model_name, use_fast=use_fast
+        )
         self.padding = padding
         self.truncation = truncation
         self.return_tensors = return_tensors
@@ -261,7 +265,9 @@ class BaseClassificationDataset(BaseDataset):
             smoothing = 0
 
         n_labels = len(self.target_unique_values)
-        labels = np.zeros(n_labels, dtype="float32") + smoothing / (n_labels - 1)
+        labels = np.zeros(n_labels, dtype="float32") + smoothing / (
+            n_labels - 1
+        )
         labels[self.target_unique_values.index(y)] = 1.0 - smoothing
 
         return labels

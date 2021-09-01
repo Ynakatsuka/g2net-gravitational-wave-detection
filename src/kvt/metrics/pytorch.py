@@ -6,7 +6,9 @@ import torchmetrics
 def torch_rmse(
     pred, target,
 ):
-    score = torch.sqrt(torchmetrics.functional.mean_squared_error(pred, target))
+    score = torch.sqrt(
+        torchmetrics.functional.mean_squared_error(pred, target)
+    )
     return score
 
 

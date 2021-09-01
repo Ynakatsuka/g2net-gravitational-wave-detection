@@ -64,7 +64,10 @@ class SoftPool(nn.Module):
             stride=(1, 1),
         ).cuda()
         conv2d_5 = nn.Conv2d(
-            self.size_feat, self.size_feat, kernel_size=(self.regions, 1), stride=(1, 1)
+            self.size_feat,
+            self.size_feat,
+            kernel_size=(self.regions, 1),
+            stride=(1, 1),
         ).cuda()
 
         sorter = Sorter(self.size_feat, self.regions)
@@ -79,9 +82,13 @@ class SoftPool(nn.Module):
         ).cuda()
 
         for region in range(self.regions):
-            x_val, x_idx = torch.sort(val_activa[:, region, :], dim=1, descending=True)
+            x_val, x_idx = torch.sort(
+                val_activa[:, region, :], dim=1, descending=True
+            )
             index = (
-                x_idx[:, : self.pnt_per_sort].unsqueeze(1).repeat(1, self.size_feat, 1)
+                x_idx[:, : self.pnt_per_sort]
+                .unsqueeze(1)
+                .repeat(1, self.size_feat, 1)
             )
 
             sp_cube[:, :, region, :] = torch.gather(x, dim=2, index=index)
@@ -96,7 +103,9 @@ class SoftPool(nn.Module):
         cabins = train2cabins(sp_cube, self.num_cabin)
 
         # we need to use succession manner to repeat cabin to fit with cube
-        sp_windows = torch.repeat_interleave(cabins, repeats=points_cabin, dim=3)
+        sp_windows = torch.repeat_interleave(
+            cabins, repeats=points_cabin, dim=3
+        )
 
         # merge cabins in train
         trains = conv2d_3(conv2d_2(conv2d_1(cabins)))

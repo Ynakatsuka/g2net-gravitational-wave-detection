@@ -37,7 +37,10 @@ class Conv2d(nn.Conv2d):
                 .mean(dim=3, keepdim=True)
             )
             weight = weight - weight_mean
-            std = weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1) + 1e-5
+            std = (
+                weight.view(weight.size(0), -1).std(dim=1).view(-1, 1, 1, 1)
+                + 1e-5
+            )
             weight = weight / std.expand_as(weight)
         return F.conv2d(
             input,

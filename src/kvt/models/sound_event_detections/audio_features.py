@@ -51,7 +51,8 @@ def compute_deltas(
     )
 
     output = (
-        torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1]) / denom
+        torch.nn.functional.conv1d(specgram, kernel, groups=specgram.shape[1])
+        / denom
     )
 
     # unpack batch
@@ -121,7 +122,13 @@ class F2M(nn.Module):
     """
 
     def __init__(
-        self, n_mels=40, sr=16000, f_max=None, f_min=0.0, n_fft=40, onesided=True
+        self,
+        n_mels=40,
+        sr=16000,
+        f_max=None,
+        f_min=0.0,
+        n_fft=40,
+        onesided=True,
     ):
         super().__init__()
         self.n_mels = n_mels
@@ -134,7 +141,11 @@ class F2M(nn.Module):
         self._init_buffers()
 
     def _init_buffers(self):
-        m_min = 0.0 if self.f_min == 0 else 2595 * np.log10(1.0 + (self.f_min / 700))
+        m_min = (
+            0.0
+            if self.f_min == 0
+            else 2595 * np.log10(1.0 + (self.f_min / 700))
+        )
         m_max = 2595 * np.log10(1.0 + (self.f_max / 700))
 
         m_pts = torch.linspace(m_min, m_max, self.n_mels + 2)
@@ -153,9 +164,9 @@ class F2M(nn.Module):
                     torch.arange(f_m_minus, f_m) - f_m_minus
                 ) / (f_m - f_m_minus)
             if f_m != f_m_plus:
-                fb[f_m:f_m_plus, m - 1] = (f_m_plus - torch.arange(f_m, f_m_plus)) / (
-                    f_m_plus - f_m
-                )
+                fb[f_m:f_m_plus, m - 1] = (
+                    f_m_plus - torch.arange(f_m, f_m_plus)
+                ) / (f_m_plus - f_m)
         self.register_buffer("fb", fb)
 
     def forward(self, spec_f):
@@ -195,14 +206,21 @@ def pcen(
     if training:
         pcen_ = (x / (M + eps).pow(alpha) + delta).pow(r) - delta ** r
     else:
-        pcen_ = x.div_(M.add_(eps).pow_(alpha)).add_(delta).pow_(r).sub_(delta ** r)
+        pcen_ = (
+            x.div_(M.add_(eps).pow_(alpha))
+            .add_(delta)
+            .pow_(r)
+            .sub_(delta ** r)
+        )
     return pcen_
 
 
 class PCENTransform(nn.Module):
     """Ref: https://www.kaggle.com/simongrest/trainable-pcen-frontend-in-pytorch"""
 
-    def __init__(self, eps=1e-6, s=0.025, alpha=0.98, delta=2, r=0.5, trainable=True):
+    def __init__(
+        self, eps=1e-6, s=0.025, alpha=0.98, delta=2, r=0.5, trainable=True
+    ):
         super().__init__()
         if trainable:
             self.log_s = nn.Parameter(torch.log(torch.Tensor([s])))

@@ -46,7 +46,9 @@ def aggregate_gradient_norms(model, max_layers=50):
                 and (param.grad is not None)
             ):
                 gradient_norms[check_name].append(param.grad.norm(2))
-    gradient_norms = {k: torch.stack(v).mean() for k, v in gradient_norms.items()}
+    gradient_norms = {
+        k: torch.stack(v).mean() for k, v in gradient_norms.items()
+    }
     return gradient_norms
 
 

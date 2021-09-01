@@ -49,14 +49,18 @@ def fix_state_dict_shallow(state_dict):
     return new_state_dict
 
 
-def load_state_dict_on_same_size(model, state_dict, threshold=0.5, infer_key=False):
+def load_state_dict_on_same_size(
+    model, state_dict, threshold=0.5, infer_key=False
+):
     new_state_dict = OrderedDict()
     overall_count, load_count = 0, 0
     skipping_layers = []
 
     for name, param in model.named_parameters():
         overall_count += 1
-        if (name in state_dict.keys()) and (param.shape == state_dict[name].shape):
+        if (name in state_dict.keys()) and (
+            param.shape == state_dict[name].shape
+        ):
             load_count += 1
             new_state_dict[name] = state_dict[name]
         else:
@@ -64,7 +68,9 @@ def load_state_dict_on_same_size(model, state_dict, threshold=0.5, infer_key=Fal
 
     for name, param in model.named_buffers():
         overall_count += 1
-        if (name in state_dict.keys()) and (param.shape == state_dict[name].shape):
+        if (name in state_dict.keys()) and (
+            param.shape == state_dict[name].shape
+        ):
             load_count += 1
             new_state_dict[name] = state_dict[name]
         else:

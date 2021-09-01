@@ -15,7 +15,9 @@ sys.path.append("src/")
 @hydra.main(config_path="../../config", config_name="default")
 def main(config: DictConfig) -> None:
     print("-" * 100)
-    pprint.PrettyPrinter(indent=2).pprint(OmegaConf.to_container(config, resolve=True))
+    pprint.PrettyPrinter(indent=2).pprint(
+        OmegaConf.to_container(config, resolve=True)
+    )
 
     fold_column = config.fold.fold_column
     train = pd.read_csv(config.competition.train_path)
@@ -29,7 +31,9 @@ def main(config: DictConfig) -> None:
     # split
     train[fold_column] = 0
     kfold = instantiate(config.fold.fold)
-    for f, (_, valid_index) in enumerate(kfold.split(train, y=y, groups=groups)):
+    for f, (_, valid_index) in enumerate(
+        kfold.split(train, y=y, groups=groups)
+    ):
         train.loc[valid_index, fold_column] = f
     path = os.path.join(config.save_dir, config.fold.csv_filename)
     train.to_csv(path, index=False)

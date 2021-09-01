@@ -14,7 +14,12 @@ class Conv3x3GNReLU(nn.Module):
 
         self.blocks = nn.Sequential(
             nn.Conv2d(
-                in_channels, out_channels, (3, 3), stride=1, padding=1, bias=False
+                in_channels,
+                out_channels,
+                (3, 3),
+                stride=1,
+                padding=1,
+                bias=False,
             ),
             nn.GroupNorm(num_groups, out_channels),
             nn.ReLU(inplace=True),
@@ -64,17 +69,28 @@ class Decoder(nn.Module):
         self.in_channels = in_channels
 
         self.center = DecoderBlock(
-            in_channels=in_channels[0], out_channels=in_channels[0], up_sample=False
+            in_channels=in_channels[0],
+            out_channels=in_channels[0],
+            up_sample=False,
         )
 
-        self.layer1 = DecoderBlock(in_channels[0] + in_channels[1], out_channels[0])
-        self.layer2 = DecoderBlock(in_channels[2] + out_channels[0], out_channels[1])
-        self.layer3 = DecoderBlock(in_channels[3] + out_channels[1], out_channels[2])
-        self.layer4 = DecoderBlock(in_channels[4] + out_channels[2], out_channels[3])
+        self.layer1 = DecoderBlock(
+            in_channels[0] + in_channels[1], out_channels[0]
+        )
+        self.layer2 = DecoderBlock(
+            in_channels[2] + out_channels[0], out_channels[1]
+        )
+        self.layer3 = DecoderBlock(
+            in_channels[3] + out_channels[1], out_channels[2]
+        )
+        self.layer4 = DecoderBlock(
+            in_channels[4] + out_channels[2], out_channels[3]
+        )
         self.layer5 = DecoderBlock(out_channels[3], out_channels[4])
 
         self.final = nn.Sequential(
-            nn.Dropout(dropout), nn.Conv2d(out_channels[-1], num_classes, kernel_size=1)
+            nn.Dropout(dropout),
+            nn.Conv2d(out_channels[-1], num_classes, kernel_size=1),
         )
 
     def forward(self, x, encodes):
@@ -99,7 +115,9 @@ class UNet(nn.Module):
         super().__init__()
         self.encoder = build_encoder(encoder)
         self.decoder = Decoder(
-            num_classes=num_classes, encoder_channels=self.encoder.channels, **kwargs
+            num_classes=num_classes,
+            encoder_channels=self.encoder.channels,
+            **kwargs,
         )
 
     def forward(self, x):
@@ -124,17 +142,28 @@ class DecoderWithClassificationHead(nn.Module):
         self.use_cls_head = use_cls_head
 
         self.center = DecoderBlock(
-            in_channels=in_channels[0], out_channels=in_channels[0], up_sample=False
+            in_channels=in_channels[0],
+            out_channels=in_channels[0],
+            up_sample=False,
         )
 
-        self.layer1 = DecoderBlock(in_channels[0] + in_channels[1], out_channels[0])
-        self.layer2 = DecoderBlock(in_channels[2] + out_channels[0], out_channels[1])
-        self.layer3 = DecoderBlock(in_channels[3] + out_channels[1], out_channels[2])
-        self.layer4 = DecoderBlock(in_channels[4] + out_channels[2], out_channels[3])
+        self.layer1 = DecoderBlock(
+            in_channels[0] + in_channels[1], out_channels[0]
+        )
+        self.layer2 = DecoderBlock(
+            in_channels[2] + out_channels[0], out_channels[1]
+        )
+        self.layer3 = DecoderBlock(
+            in_channels[3] + out_channels[1], out_channels[2]
+        )
+        self.layer4 = DecoderBlock(
+            in_channels[4] + out_channels[2], out_channels[3]
+        )
         self.layer5 = DecoderBlock(out_channels[3], out_channels[4])
 
         self.final = nn.Sequential(
-            nn.Dropout(dropout), nn.Conv2d(out_channels[-1], num_classes, kernel_size=1)
+            nn.Dropout(dropout),
+            nn.Conv2d(out_channels[-1], num_classes, kernel_size=1),
         )
 
         if self.use_cls_head:
@@ -183,7 +212,9 @@ class UNetWithClassificationHead(nn.Module):
         super().__init__()
         self.encoder = build_encoder(encoder)
         self.decoder = DecoderWithClassificationHead(
-            num_classes=num_classes, encoder_channels=self.encoder.channels, **kwargs
+            num_classes=num_classes,
+            encoder_channels=self.encoder.channels,
+            **kwargs,
         )
 
     def forward(self, x):

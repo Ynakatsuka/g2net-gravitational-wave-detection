@@ -21,19 +21,27 @@ class NeedleAugmentation(ImageOnlyTransform):
 
     def apply(self, image, **params):
         height, width, _ = image.shape  # target image width and height
-        needle_images = [im for im in os.listdir(self.needle_folder) if "png" in im]
+        needle_images = [
+            im for im in os.listdir(self.needle_folder) if "png" in im
+        ]
 
         for _ in range(1, self.n_needles):
             needle = cv2.cvtColor(
                 cv2.imread(
-                    os.path.join(self.needle_folder, random.choice(needle_images))
+                    os.path.join(
+                        self.needle_folder, random.choice(needle_images)
+                    )
                 ),
                 cv2.COLOR_BGR2RGB,
             )
             needle = cv2.flip(needle, random.choice([-1, 0, 1]))
             needle = cv2.rotate(needle, random.choice([0, 1, 2]))
 
-            h_height, h_width, _ = needle.shape  # needle image width and height
+            (
+                h_height,
+                h_width,
+                _,
+            ) = needle.shape  # needle image width and height
             roi_ho = random.randint(0, abs(image.shape[0] - needle.shape[0]))
             roi_wo = random.randint(0, abs(image.shape[1] - needle.shape[1]))
             roi = image[roi_ho : roi_ho + h_height, roi_wo : roi_wo + h_width]

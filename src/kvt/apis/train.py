@@ -125,7 +125,9 @@ def run(config):
 
     # auto resume_from_checkpoint
     # reload if best_model_path exists
-    if config.trainer.auto_resume_from_checkpoint and os.path.exists(best_model_path):
+    if config.trainer.auto_resume_from_checkpoint and os.path.exists(
+        best_model_path
+    ):
         print(f"Auto Loading: {best_model_path}")
         config.trainer.trainer.resume_from_checkpoint = best_model_path
 
@@ -134,7 +136,10 @@ def run(config):
     # ------------------------------
     # train loop
     trainer = pl.Trainer(
-        logger=logger, callbacks=callbacks, plugins=plugins, **config.trainer.trainer
+        logger=logger,
+        callbacks=callbacks,
+        plugins=plugins,
+        **config.trainer.trainer,
     )
     if not config.trainer.skip_training:
         trainer.fit(

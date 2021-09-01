@@ -11,7 +11,12 @@ from kvt.builder import (
     build_model,
     build_tta_wrapper,
 )
-from kvt.utils import check_attr, concatenate, replace_last_linear, save_predictions
+from kvt.utils import (
+    check_attr,
+    concatenate,
+    replace_last_linear,
+    save_predictions,
+)
 
 
 def run(config):

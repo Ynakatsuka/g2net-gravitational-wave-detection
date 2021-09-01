@@ -1,4 +1,6 @@
-def initialize_model(config, model, backbone_lr_ratio=None, encoder_lr_ratio=None):
+def initialize_model(
+    config, model, backbone_lr_ratio=None, encoder_lr_ratio=None
+):
     params = model.parameters()
 
     # set learning rate
@@ -46,7 +48,11 @@ def reinitialize_model(config, model):
 
 
 def initialize_transformer_models(
-    config, model, learning_rate, weight_decay, layerwise_learning_rate_decay=0.9,
+    config,
+    model,
+    learning_rate,
+    weight_decay,
+    layerwise_learning_rate_decay=0.9,
 ):
     """
     Ref: https://www.kaggle.com/rhtsingh/on-stability-of-few-sample-transformer-fine-tuning

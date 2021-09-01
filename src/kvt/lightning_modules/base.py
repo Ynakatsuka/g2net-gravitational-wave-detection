@@ -54,7 +54,9 @@ class LightningModuleBase(pl.LightningModule):
             self.test_transform = None
         elif isinstance(transform, dict):
             keys = transform.keys()
-            self.train_transform = transform["train"] if "train" in keys else None
+            self.train_transform = (
+                transform["train"] if "train" in keys else None
+            )
             self.valid_transform = (
                 transform["validation"] if "validation" in keys else None
             )
@@ -70,7 +72,9 @@ class LightningModuleBase(pl.LightningModule):
             raise ValueError("metric_fn must be dict.")
 
         # for metric learning model
-        self.is_metric_learning = "label" in inspect.getfullargspec(model.forward).args
+        self.is_metric_learning = (
+            "label" in inspect.getfullargspec(model.forward).args
+        )
 
         # for tta
         self.tta_enabled = False
@@ -89,10 +93,18 @@ class LightningModuleBase(pl.LightningModule):
             funcs = self.hooks.visualization
             if isinstance(funcs, list):
                 for func in funcs:
-                    r = func(self.model, dataloader, predictions, targets, self.logger)
+                    r = func(
+                        self.model,
+                        dataloader,
+                        predictions,
+                        targets,
+                        self.logger,
+                    )
                     visualization_result.update(r)
             else:
-                r = funcs(self.model, dataloader, predictions, targets, self.logger)
+                r = funcs(
+                    self.model, dataloader, predictions, targets, self.logger
+                )
                 visualization_result.update(r)
 
             # log
@@ -101,7 +113,9 @@ class LightningModuleBase(pl.LightningModule):
                     if os.path.exists(value):
                         self.logger.experiment.log({key: [wandb.Image(value)]})
             else:
-                print(f"Log artifacts is not supported for {type(self.logger)}")
+                print(
+                    f"Log artifacts is not supported for {type(self.logger)}"
+                )
 
         return visualization_result
 
@@ -132,7 +146,10 @@ class LightningModuleBase(pl.LightningModule):
                     <= self.trainer.max_epochs
                     - self.disable_strong_transform_in_last_epochs
                 )
-                or (self.current_epoch > self.disable_strong_transform_in_first_epochs)
+                or (
+                    self.current_epoch
+                    > self.disable_strong_transform_in_first_epochs
+                )
             )
             and (np.random.rand() < self.storong_transform_p)
         ):
@@ -150,30 +167,44 @@ class LightningModuleBase(pl.LightningModule):
         if "y" in batch.keys():
             y = batch["y"]  # x, y: dict or tensor
             if isinstance(y, dict):
-                main_target_key = list(set(y.keys()) & set(self.main_target_keys))
+                main_target_key = list(
+                    set(y.keys()) & set(self.main_target_keys)
+                )
                 assert len(main_target_key) == 1, main_target_key
                 main_target_key = main_target_key[0]
 
                 aux_y = {k: v for k, v in y.items() if k != main_target_key}
                 y = y[main_target_key]
             else:
-                aux_y = {k: v for k, v in batch.items() if (k != "y") and (k[0] == "y")}
+                aux_y = {
+                    k: v
+                    for k, v in batch.items()
+                    if (k != "y") and (k[0] == "y")
+                }
         else:
             y, aux_y = None, None
 
         if "x" in batch.keys():
             x = batch["x"]  # x, y: dict or tensor
             if isinstance(x, dict):
-                main_input_key = list(set(x.keys()) & set(self.main_input_keys))
+                main_input_key = list(
+                    set(x.keys()) & set(self.main_input_keys)
+                )
                 assert len(main_input_key) == 1, main_input_key
                 main_input_key = main_input_key[0]
 
                 aux_x = {k: v for k, v in x.items() if k != main_input_key}
                 x = x[main_input_key]
             else:
-                aux_x = {k: v for k, v in batch.items() if (k != "x") and (k[0] == "x")}
+                aux_x = {
+                    k: v
+                    for k, v in batch.items()
+                    if (k != "x") and (k[0] == "x")
+                }
         else:
-            main_input_key = list(set(batch.keys()) & set(self.main_input_keys))
+            main_input_key = list(
+                set(batch.keys()) & set(self.main_input_keys)
+            )
             assert len(main_input_key) == 1, main_input_key
             main_input_key = main_input_key[0]
 
@@ -202,7 +233,9 @@ class LightningModuleBase(pl.LightningModule):
     # for dp, ddp
     # https://github.com/PyTorchLightning/pytorch-lightning/issues/4073
     def training_step_end(self, training_step_outputs):
-        outputs = {name: val.sum() for name, val in training_step_outputs.items()}
+        outputs = {
+            name: val.sum() for name, val in training_step_outputs.items()
+        }
 
         self.log_dict(outputs)
 
@@ -272,7 +305,8 @@ class LightningModuleBase(pl.LightningModule):
 
             if torch.distributed.is_initialized():
                 gathered_value = [
-                    torch.zeros_like(value) for _ in range(dist.get_world_size())
+                    torch.zeros_like(value)
+                    for _ in range(dist.get_world_size())
                 ]
                 dist.all_gather(gathered_value, value)
                 gathered_outputs[key] = torch.cat(gathered_value)
@@ -291,13 +325,19 @@ class LightningModuleBase(pl.LightningModule):
 
         if self.enable_overall_evaluation:
             metric_outputs = self._calculate_evaluation(
-                gathered_outputs["y_hat"], gathered_outputs["y"], suffix="_overall"
+                gathered_outputs["y_hat"],
+                gathered_outputs["y"],
+                suffix="_overall",
             )
             avg_outputs.update(metric_outputs)
 
         if not self.trainer.sanity_checking:
             self.log_dict(
-                avg_outputs, on_epoch=True, prog_bar=True, logger=True, sync_dist=True
+                avg_outputs,
+                on_epoch=True,
+                prog_bar=True,
+                logger=True,
+                sync_dist=True,
             )
 
         return avg_outputs

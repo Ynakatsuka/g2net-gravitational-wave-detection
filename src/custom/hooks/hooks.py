@@ -62,18 +62,24 @@ class G2NetGradCamVisualizationHook(VisualizationHookBase):
         for x in batch["x"]:
             out = model(x.unsqueeze(0))
             img = model(x.unsqueeze(0), return_spectrogram=True)
-            activation_map = cam_extractor(out.unsqueeze(0).argmax().item(), out)
+            activation_map = cam_extractor(
+                out.unsqueeze(0).argmax().item(), out
+            )
             inputs.append(x)
             output_cams.append(activation_map)
             images.append(img)
         return inputs, output_cams, images
 
-    def _plot_cams(self, save_path, inputs, cams, images, predictions, targets):
+    def _plot_cams(
+        self, save_path, inputs, cams, images, predictions, targets
+    ):
         n_cols = 2
         n_rows = self.num_plots
 
         plt.clf()
-        _, axes = plt.subplots(n_rows, n_cols, figsize=self.figsize, tight_layout=True)
+        _, axes = plt.subplots(
+            n_rows, n_cols, figsize=self.figsize, tight_layout=True
+        )
 
         for i in range(n_rows):
             axes[i][0].plot(inputs[i].numpy().T)
@@ -86,14 +92,18 @@ class G2NetGradCamVisualizationHook(VisualizationHookBase):
             original_inputs = to_pil_image(inp)
             to_show = hstack_pil_image(original_inputs, overlay_cam)
             axes[i][1].imshow(to_show)
-            axes[i][1].set_title(f"Pred: {predictions[i]}, Target: {targets[i]}")
+            axes[i][1].set_title(
+                f"Pred: {predictions[i]}, Target: {targets[i]}"
+            )
             axes[i][1].axis("off")
 
         plt.savefig(save_path)
 
     def __call__(self, model, dataloader, predictions, targets, logger=None):
         if self.target_layer is None:
-            self.target_layer = "backbone." + locate_candidate_layer(model.backbone)
+            self.target_layer = "backbone." + locate_candidate_layer(
+                model.backbone
+            )
             print("[Target Layer of CAM] ", self.target_layer)
 
         cam_extractor = getattr(cams, self.method)(
@@ -109,7 +119,9 @@ class G2NetGradCamVisualizationHook(VisualizationHookBase):
             indices = np.argsort(deviation)[-self.num_plots :]
 
         # create new dataloader
-        new_dataloader = make_subset_dataloader(dataloader, indices, self.num_plots)
+        new_dataloader = make_subset_dataloader(
+            dataloader, indices, self.num_plots
+        )
         top_inputs, top_cams, images = self._extract_cam_on_first_batch(
             cam_extractor, model, new_dataloader
         )
@@ -132,9 +144,9 @@ class HardSampleROCAUCVisualizationHook(VisualizationHookBase):
 
         fold_id = dataloader.dataset.idx_fold
 
-        path = sorted(glob.glob("../data/output/predictions/oof/default/*.npy"))[
-            fold_id
-        ]
+        path = sorted(
+            glob.glob("../data/output/predictions/oof/default/*.npy")
+        )[fold_id]
         base_predictions = np.load(path)
 
         deviation = np.abs(base_predictions - targets)

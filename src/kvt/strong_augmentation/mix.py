@@ -38,14 +38,20 @@ def cutmix(data, target, alpha=1.0):
         data.size(), bbx2 - bbx1, bby2 - bby1
     )
 
-    data[:, :, bby1_p:bby2_p, bbx1_p:bbx2_p] = data[indices, :, bby1:bby2, bbx1:bbx2]
+    data[:, :, bby1_p:bby2_p, bbx1_p:bbx2_p] = data[
+        indices, :, bby1:bby2, bbx1:bbx2
+    ]
     # adjust lambda to exactly match pixel ratio
-    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2]))
+    lam = 1 - (
+        (bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2])
+    )
 
     return data, target, shuffled_target, lam, indices
 
 
-def fmix(data, target, alpha=1.0, decay_power=3, max_soft=0.0, reformulate=False):
+def fmix(
+    data, target, alpha=1.0, decay_power=3, max_soft=0.0, reformulate=False
+):
     device = data.device
     shape = (data.size(2), data.size(3))
     lam, mask = sample_mask(alpha, decay_power, shape, max_soft, reformulate)
@@ -72,7 +78,9 @@ def resizemix(data, target, alpha=1.0, mode="bilinear"):
     )
 
     # adjust lambda to exactly match pixel ratio
-    lam = 1 - ((bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2]))
+    lam = 1 - (
+        (bbx2 - bbx1) * (bby2 - bby1) / (data.size()[-1] * data.size()[-2])
+    )
 
     return data, target, shuffled_target, lam, indices
 
@@ -100,7 +108,10 @@ def snapmix(data, target, model, snapmix_id, beta=1.0):
     if area1 > 0 and area > 0:
         ncont = data[indices, :, bbx1_1:bbx2_1, bby1_1:bby2_1].clone()
         ncont = F.interpolate(
-            ncont, size=(bbx2 - bbx1, bby2 - bby1), mode="bilinear", align_corners=True
+            ncont,
+            size=(bbx2 - bbx1, bby2 - bby1),
+            mode="bilinear",
+            align_corners=True,
         )
         data[:, :, bbx1:bbx2, bby1:bby2] = ncont
         lam_a = 1 - wfmaps[:, bbx1:bbx2, bby1:bby2].sum(2).sum(1) / (

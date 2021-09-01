@@ -62,7 +62,10 @@ def shear_x(pil_img, level):
     if np.random.uniform() > 0.5:
         level = -level
     return pil_img.transform(
-        pil_img.size, Image.AFFINE, (1, level, 0, 0, 1, 0), resample=Image.BILINEAR
+        pil_img.size,
+        Image.AFFINE,
+        (1, level, 0, 0, 1, 0),
+        resample=Image.BILINEAR,
     )
 
 
@@ -71,7 +74,10 @@ def shear_y(pil_img, level):
     if np.random.uniform() > 0.5:
         level = -level
     return pil_img.transform(
-        pil_img.size, Image.AFFINE, (1, 0, 0, level, 1, 0), resample=Image.BILINEAR
+        pil_img.size,
+        Image.AFFINE,
+        (1, 0, 0, level, 1, 0),
+        resample=Image.BILINEAR,
     )
 
 
@@ -80,7 +86,10 @@ def translate_x(pil_img, level):
     if np.random.random() > 0.5:
         level = -level
     return pil_img.transform(
-        pil_img.size, Image.AFFINE, (1, 0, level, 0, 1, 0), resample=Image.BILINEAR
+        pil_img.size,
+        Image.AFFINE,
+        (1, 0, level, 0, 1, 0),
+        resample=Image.BILINEAR,
     )
 
 
@@ -89,7 +98,10 @@ def translate_y(pil_img, level):
     if np.random.random() > 0.5:
         level = -level
     return pil_img.transform(
-        pil_img.size, Image.AFFINE, (1, 0, 0, 0, 1, level), resample=Image.BILINEAR
+        pil_img.size,
+        Image.AFFINE,
+        (1, 0, 0, 0, 1, level),
+        resample=Image.BILINEAR,
     )
 
 
@@ -191,7 +203,13 @@ def augment_and_mix(image, severity=3, width=3, depth=-1, alpha=1.0):
 
 class RandomAugMix(ImageOnlyTransform):
     def __init__(
-        self, severity=3, width=3, depth=-1, alpha=1.0, always_apply=False, p=0.5
+        self,
+        severity=3,
+        width=3,
+        depth=-1,
+        alpha=1.0,
+        always_apply=False,
+        p=0.5,
     ):
         super().__init__(always_apply, p)
         self.severity = severity

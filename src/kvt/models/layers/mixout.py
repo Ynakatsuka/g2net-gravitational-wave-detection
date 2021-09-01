@@ -14,7 +14,9 @@ class Mixout(InplaceFunction):
         return input.new().resize_as_(input)
 
     @classmethod
-    def forward(cls, ctx, input, target=None, p=0.0, training=False, inplace=False):
+    def forward(
+        cls, ctx, input, target=None, p=0.0, training=False, inplace=False
+    ):
         if p < 0 or p > 1:
             raise ValueError(
                 "A mix probability of mixout has to be between 0 and 1,"
@@ -73,7 +75,9 @@ def mixout(input, target=None, p=0.0, training=False, inplace=False):
 class MixLinear(nn.Module):
     __constants__ = ["bias", "in_features", "out_features"]
 
-    def __init__(self, in_features, out_features, bias=True, target=None, p=0.0):
+    def __init__(
+        self, in_features, out_features, bias=True, target=None, p=0.0
+    ):
         super(MixLinear, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
@@ -95,7 +99,9 @@ class MixLinear(nn.Module):
 
     def forward(self, input):
         return F.linear(
-            input, mixout(self.weight, self.target, self.p, self.training), self.bias
+            input,
+            mixout(self.weight, self.target, self.p, self.training),
+            self.bias,
         )
 
     def extra_repr(self):

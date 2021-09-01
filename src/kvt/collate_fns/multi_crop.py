@@ -4,7 +4,10 @@ import torchvision.transforms as T
 from lightly.transforms import GaussianBlur, RandomSolarization
 from PIL import Image
 
-imagenet_normalize = {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}
+imagenet_normalize = {
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
+}
 
 
 class DinoCollateFunction(nn.Module):
@@ -41,20 +44,26 @@ class DinoCollateFunction(nn.Module):
             [
                 T.RandomHorizontalFlip(p=hf_prob),
                 T.RandomApply(
-                    [T.ColorJitter(cj_bright, cj_contrast, cj_sat, cj_hue)], p=cj_prob
+                    [T.ColorJitter(cj_bright, cj_contrast, cj_sat, cj_hue)],
+                    p=cj_prob,
                 ),
                 T.RandomGrayscale(p=random_gray_scale),
             ]
         )
         normalize = T.Compose(
-            [T.ToTensor(), T.Normalize(mean=normalize["mean"], std=normalize["std"]),]
+            [
+                T.ToTensor(),
+                T.Normalize(mean=normalize["mean"], std=normalize["std"]),
+            ]
         )
 
         # first global crop
         self.global_transfo1 = T.Compose(
             [
                 T.RandomResizedCrop(
-                    input_size_, scale=global_crops_scale, interpolation=Image.BICUBIC
+                    input_size_,
+                    scale=global_crops_scale,
+                    interpolation=Image.BICUBIC,
                 ),
                 flip_and_color_jitter,
                 GaussianBlur(1.0),
@@ -65,7 +74,9 @@ class DinoCollateFunction(nn.Module):
         self.global_transfo2 = T.Compose(
             [
                 T.RandomResizedCrop(
-                    input_size_, scale=global_crops_scale, interpolation=Image.BICUBIC
+                    input_size_,
+                    scale=global_crops_scale,
+                    interpolation=Image.BICUBIC,
                 ),
                 flip_and_color_jitter,
                 GaussianBlur(random_gaussian_blur),

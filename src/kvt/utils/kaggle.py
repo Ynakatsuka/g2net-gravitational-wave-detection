@@ -71,7 +71,10 @@ def monitor_submission_time(competition_name):
             now = datetime.datetime.now(timezone.utc).replace(tzinfo=None)
             elapsed_time = int((now - submit_time).seconds / 60) + 1
             if status == "complete":
-                print("\r", f"run-time: {elapsed_time} min, LB: {result.publicScore}")
+                print(
+                    "\r",
+                    f"run-time: {elapsed_time} min, LB: {result.publicScore}",
+                )
                 print(f"{result.fileName}: {result.url}")
             else:
                 print("\r", f"elapsed time: {elapsed_time} min", end="")

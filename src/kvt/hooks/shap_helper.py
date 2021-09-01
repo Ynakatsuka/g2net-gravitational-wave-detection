@@ -410,7 +410,9 @@ rgb_from_xyz = linalg.inv(xyz_from_rgb)
 # From https://en.wikipedia.org/wiki/CIE_1931_color_space
 # Note: Travis's code did not have the divide by 0.17697
 xyz_from_rgbcie = (
-    np.array([[0.49, 0.31, 0.20], [0.17697, 0.81240, 0.01063], [0.00, 0.01, 0.99]])
+    np.array(
+        [[0.49, 0.31, 0.20], [0.17697, 0.81240, 0.01063], [0.00, 0.01, 0.99]]
+    )
     / 0.17697
 )
 
@@ -444,13 +446,21 @@ yiq_from_rgb = np.array(
 rgb_from_yiq = linalg.inv(yiq_from_rgb)
 
 ypbpr_from_rgb = np.array(
-    [[0.299, 0.587, 0.114], [-0.168736, -0.331264, 0.5], [0.5, -0.418688, -0.081312]]
+    [
+        [0.299, 0.587, 0.114],
+        [-0.168736, -0.331264, 0.5],
+        [0.5, -0.418688, -0.081312],
+    ]
 )
 
 rgb_from_ypbpr = linalg.inv(ypbpr_from_rgb)
 
 ycbcr_from_rgb = np.array(
-    [[65.481, 128.553, 24.966], [-37.797, -74.203, 112.0], [112.0, -93.786, -18.214]]
+    [
+        [65.481, 128.553, 24.966],
+        [-37.797, -74.203, 112.0],
+        [112.0, -93.786, -18.214],
+    ]
 )
 
 rgb_from_ycbcr = linalg.inv(ycbcr_from_rgb)
@@ -536,7 +546,9 @@ _integer_types = (
     np.longlong,
     np.ulonglong,
 )  # 64 bits
-_integer_ranges = {t: (np.iinfo(t).min, np.iinfo(t).max) for t in _integer_types}
+_integer_ranges = {
+    t: (np.iinfo(t).min, np.iinfo(t).max) for t in _integer_types
+}
 dtype_range = {
     np.bool_: (False, True),
     np.bool8: (False, True),
@@ -651,7 +663,9 @@ def _scale(a, n, m, copy=True):
         # downscale with precision loss
         if copy:
             b = np.empty(a.shape, _dtype_bits(kind, m))
-            np.floor_divide(a, 2 ** (n - m), out=b, dtype=a.dtype, casting="unsafe")
+            np.floor_divide(
+                a, 2 ** (n - m), out=b, dtype=a.dtype, casting="unsafe"
+            )
             return b
         else:
             a //= 2 ** (n - m)
@@ -789,7 +803,9 @@ def convert(image, dtype, force_copy=False, uniform=False):
 
         if not uniform:
             if kind_out == "u":
-                image_out = np.multiply(image, imax_out, dtype=computation_type)
+                image_out = np.multiply(
+                    image, imax_out, dtype=computation_type
+                )
             else:
                 image_out = np.multiply(
                     image, (imax_out - imin_out) / 2, dtype=computation_type
@@ -798,11 +814,15 @@ def convert(image, dtype, force_copy=False, uniform=False):
             np.rint(image_out, out=image_out)
             np.clip(image_out, imin_out, imax_out, out=image_out)
         elif kind_out == "u":
-            image_out = np.multiply(image, imax_out + 1, dtype=computation_type)
+            image_out = np.multiply(
+                image, imax_out + 1, dtype=computation_type
+            )
             np.clip(image_out, 0, imax_out, out=image_out)
         else:
             image_out = np.multiply(
-                image, (imax_out - imin_out + 1.0) / 2.0, dtype=computation_type
+                image,
+                (imax_out - imin_out + 1.0) / 2.0,
+                dtype=computation_type,
             )
             np.floor(image_out, out=image_out)
             np.clip(image_out, imin_out, imax_out, out=image_out)
@@ -933,7 +953,9 @@ for l in np.linspace(1, 0, 100):
     colors.append((30.0 / 255, 136.0 / 255, 229.0 / 255, l))
 for l in np.linspace(0, 1, 100):
     colors.append((255.0 / 255, 13.0 / 255, 87.0 / 255, l))
-red_transparent_blue = LinearSegmentedColormap.from_list("red_transparent_blue", colors)
+red_transparent_blue = LinearSegmentedColormap.from_list(
+    "red_transparent_blue", colors
+)
 
 
 blue_lch = [54.0, 70.0, 4.6588]
@@ -1008,7 +1030,8 @@ def text(
 
     # loop when we get multi-row inputs
     if len(shap_values.shape) == 2 and (
-        shap_values.output_names is None or isinstance(shap_values.output_names, str)
+        shap_values.output_names is None
+        or isinstance(shap_values.output_names, str)
     ):
         xmin = 0
         xmax = 0
@@ -1016,16 +1039,26 @@ def text(
 
         for i in range(0, len(shap_values)):
 
-            values, clustering = unpack_shap_explanation_contents(shap_values[i])
+            values, clustering = unpack_shap_explanation_contents(
+                shap_values[i]
+            )
             tokens, values, group_sizes = process_shap_values(
-                shap_values[i].data, values, group_threshold, separator, clustering
+                shap_values[i].data,
+                values,
+                group_threshold,
+                separator,
+                clustering,
             )
 
             if i == 0:
-                xmin, xmax, cmax = values_min_max(values, shap_values[i].base_values)
+                xmin, xmax, cmax = values_min_max(
+                    values, shap_values[i].base_values
+                )
                 continue
 
-            xmin_i, xmax_i, cmax_i = values_min_max(values, shap_values[i].base_values)
+            xmin_i, xmax_i, cmax_i = values_min_max(
+                values, shap_values[i].base_values
+            )
             if xmin_i < xmin:
                 xmin = xmin_i
             if xmax_i > xmax:
@@ -1082,7 +1115,8 @@ def text(
 
     uuid = "".join(random.choices(string.ascii_lowercase, k=20))
     encoded_tokens = [
-        t.replace("<", "&lt;").replace(">", "&gt;").replace(" ##", "") for t in tokens
+        t.replace("<", "&lt;").replace(">", "&gt;").replace(" ##", "")
+        for t in tokens
     ]
     out += svg_force_plot(
         values,
@@ -1140,7 +1174,10 @@ def text(
             + f"onmouseout=\"document.getElementById('_fb_{uuid}_ind_{i}').style.opacity = 0; document.getElementById('_fs_{uuid}_ind_{i}').style.opacity = 0;"
             + '"'
             + ">"
-            + tokens[i].replace("<", "&lt;").replace(">", "&gt;").replace(" ##", "")
+            + tokens[i]
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace(" ##", "")
             + "</div>"
             + "</div>"
         )
@@ -1150,7 +1187,12 @@ def text(
 
 
 def process_shap_values(
-    tokens, values, group_threshold, separator, clustering=None, return_meta_data=False
+    tokens,
+    values,
+    group_threshold,
+    separator,
+    clustering=None,
+    return_meta_data=False,
 ):
 
     # See if we got hierarchical input data. If we did then we need to reprocess the
@@ -1176,9 +1218,13 @@ def process_shap_values(
             li = int(clustering[i, 0])
             ri = int(clustering[i, 1])
             groups.append(groups[li] + groups[ri])
-            lower_values[M + i] = lower_values[li] + lower_values[ri] + values[M + i]
+            lower_values[M + i] = (
+                lower_values[li] + lower_values[ri] + values[M + i]
+            )
             max_values[i + M] = max(
-                abs(values[M + i]) / len(groups[M + i]), max_values[li], max_values[ri]
+                abs(values[M + i]) / len(groups[M + i]),
+                max_values[li],
+                max_values[ri],
             )
 
         # compute the upper_values
@@ -1254,7 +1300,9 @@ def process_shap_values(
                     merge_tokens(new_tokens, new_values, group_sizes, li)
                     merge_tokens(new_tokens, new_values, group_sizes, ri)
 
-        merge_tokens(new_tokens, new_values, group_sizes, len(group_values) - 1)
+        merge_tokens(
+            new_tokens, new_values, group_sizes, len(group_values) - 1
+        )
 
         # replance the incoming parameters with the grouped versions
         tokens = np.array(new_tokens)
@@ -1638,7 +1686,9 @@ def text_old(
                     merge_tokens(new_tokens, new_values, group_sizes, li)
                     merge_tokens(new_tokens, new_values, group_sizes, ri)
 
-        merge_tokens(new_tokens, new_shap_values, group_sizes, len(group_values) - 1)
+        merge_tokens(
+            new_tokens, new_shap_values, group_sizes, len(group_values) - 1
+        )
 
         # replance the incoming parameters with the grouped versions
         tokens = np.array(new_tokens)
@@ -1699,7 +1749,10 @@ def text_old(
             + "}"
             + '"'
             + ">"
-            + tokens[i].replace("<", "&lt;").replace(">", "&gt;").replace(" ##", "")
+            + tokens[i]
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace(" ##", "")
             + "</div>"
             + "</div>"
         )
@@ -1783,7 +1836,9 @@ def saliency_plot(shap_values):
     )
 
     def compress_shap_matrix(shap_matrix, group_sizes):
-        compressed_matrix = np.zeros((group_sizes.shape[0], shap_matrix.shape[1]))
+        compressed_matrix = np.zeros(
+            (group_sizes.shape[0], shap_matrix.shape[1])
+        )
         counter = 0
         for index in range(len(group_sizes)):
             compressed_matrix[index, :] = np.sum(
@@ -1793,18 +1848,24 @@ def saliency_plot(shap_values):
 
         return compressed_matrix
 
-    compressed_shap_matrix = compress_shap_matrix(shap_values.values, group_sizes)
+    compressed_shap_matrix = compress_shap_matrix(
+        shap_values.values, group_sizes
+    )
 
     # generate background colors of saliency plot
 
     def get_colors(shap_values):
         input_colors = []
-        cmax = max(abs(compressed_shap_matrix.min()), abs(compressed_shap_matrix.max()))
+        cmax = max(
+            abs(compressed_shap_matrix.min()),
+            abs(compressed_shap_matrix.max()),
+        )
         for row_index in range(compressed_shap_matrix.shape[0]):
             input_colors_row = []
             for col_index in range(compressed_shap_matrix.shape[1]):
                 scaled_value = (
-                    0.5 + 0.5 * compressed_shap_matrix[row_index, col_index] / cmax
+                    0.5
+                    + 0.5 * compressed_shap_matrix[row_index, col_index] / cmax
                 )
                 color = red_transparent_blue(scaled_value)
                 color = "rgba" + str(
@@ -1895,7 +1956,9 @@ def heatmap(shap_values):
     def process_text_to_text_shap_values(shap_values):
         processed_values = []
 
-        unpacked_values, clustering = unpack_shap_explanation_contents(shap_values)
+        unpacked_values, clustering = unpack_shap_explanation_contents(
+            shap_values
+        )
         max_val = 0
 
         for index, output_token in enumerate(shap_values.output_names):
@@ -1906,7 +1969,12 @@ def heatmap(shap_values):
                 token_id_to_node_id_mapping,
                 collapsed_node_ids,
             ) = process_shap_values(
-                shap_values.data, unpacked_values[:, index], 1, "", clustering, True
+                shap_values.data,
+                unpacked_values[:, index],
+                1,
+                "",
+                clustering,
+                True,
             )
             processed_value = {
                 "tokens": tokens,
@@ -1931,7 +1999,9 @@ def heatmap(shap_values):
     colors_dict = {}
     shap_values_dict = {}
     token_id_to_node_id_mapping = {}
-    cmax = max(abs(shap_values.values.min()), abs(shap_values.values.max()), max_val)
+    cmax = max(
+        abs(shap_values.values.min()), abs(shap_values.values.max()), max_val
+    )
 
     # input token -> output token color and label value mapping
 
@@ -1940,15 +2010,20 @@ def heatmap(shap_values):
         shap_values_list = {}
 
         for col_index in range(len(model_output)):
-            color_values[uuid + "_output_flat_token_" + str(col_index)] = "rgba" + str(
-                get_color(shap_values.values[row_index][col_index], cmax)
+            color_values[uuid + "_output_flat_token_" + str(col_index)] = (
+                "rgba"
+                + str(
+                    get_color(shap_values.values[row_index][col_index], cmax)
+                )
             )
             shap_values_list[
                 uuid + "_output_flat_value_label_" + str(col_index)
             ] = round(shap_values.values[row_index][col_index], 3)
 
         colors_dict[f"{uuid}_input_node_{row_index}_content"] = color_values
-        shap_values_dict[f"{uuid}_input_node_{row_index}_content"] = shap_values_list
+        shap_values_dict[
+            f"{uuid}_input_node_{row_index}_content"
+        ] = shap_values_list
 
     # output token -> input token color and label value mapping
 
@@ -1962,11 +2037,19 @@ def heatmap(shap_values):
             color_values[
                 uuid
                 + "_input_node_"
-                + str(processed_values[col_index]["collapsed_node_ids"][row_index])
+                + str(
+                    processed_values[col_index]["collapsed_node_ids"][
+                        row_index
+                    ]
+                )
                 + "_content"
             ] = (
                 "rgba"
-                + str(get_color(processed_values[col_index]["values"][row_index], cmax))
+                + str(
+                    get_color(
+                        processed_values[col_index]["values"][row_index], cmax
+                    )
+                )
             )
             shap_label_value_str = str(
                 round(processed_values[col_index]["values"][row_index], 3)
@@ -1979,11 +2062,17 @@ def heatmap(shap_values):
             shap_values_list[
                 uuid
                 + "_input_node_"
-                + str(processed_values[col_index]["collapsed_node_ids"][row_index])
+                + str(
+                    processed_values[col_index]["collapsed_node_ids"][
+                        row_index
+                    ]
+                )
                 + "_label"
             ] = shap_label_value_str
 
-        colors_dict[uuid + "_output_flat_token_" + str(col_index)] = color_values
+        colors_dict[
+            uuid + "_output_flat_token_" + str(col_index)
+        ] = color_values
         shap_values_dict[
             uuid + "_output_flat_token_" + str(col_index)
         ] = shap_values_list
@@ -2098,7 +2187,9 @@ def heatmap(shap_values):
 
         return input_text_html
 
-    input_text_html = populate_input_tree(list(tree.keys())[0], tree, input_text_html)
+    input_text_html = populate_input_tree(
+        list(tree.keys())[0], tree, input_text_html
+    )
 
     # generates the output token html elements
     output_text_html = ""

@@ -11,7 +11,9 @@ class Registry:
 
     def __repr__(self):
         format_str = self.__class__.__name__
-        format_str += f"(name={self._name}, items={list(self._obj_dict.keys())})"
+        format_str += (
+            f"(name={self._name}, items={list(self._obj_dict.keys())})"
+        )
         return format_str
 
     @property
@@ -44,7 +46,9 @@ class Registry:
         return obj
 
 
-def build_from_config(config, registry, default_args=None, match_object_args=False):
+def build_from_config(
+    config, registry, default_args=None, match_object_args=False
+):
     """Build a callable object from configuation dict.
 
     Args:
@@ -83,7 +87,9 @@ def build_from_config(config, registry, default_args=None, match_object_args=Fal
         if len(invalid_args):
             print(f"[Ignore args] {invalid_args}")
 
-    if (name in kvt.registry.METRICS._obj_dict.keys()) and (inspect.isfunction(obj)):
+    if (name in kvt.registry.METRICS._obj_dict.keys()) and (
+        inspect.isfunction(obj)
+    ):
         o = functools.partial(obj, **args)
     else:
         o = obj(**args)

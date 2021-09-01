@@ -78,9 +78,9 @@ class DefaultModelBuilderHook(ModelBuilderHookBase):
                 else:
                     state_dict = loaded_object
             else:
-                state_dict = torch.hub.load_state_dict_from_url(path, progress=True)[
-                    "state_dict"
-                ]
+                state_dict = torch.hub.load_state_dict_from_url(
+                    path, progress=True
+                )["state_dict"]
 
             # fix state_dict: local model trained on dp
             state_dict = kvt.utils.fix_dp_model_state_dict(state_dict)
@@ -90,7 +90,9 @@ class DefaultModelBuilderHook(ModelBuilderHookBase):
                 if config.fix_state_dict == "mocov2":
                     state_dict = kvt.utils.fix_mocov2_state_dict(state_dict)
                 elif config.fix_state_dict == "transformers":
-                    state_dict = kvt.utils.fix_transformers_state_dict(state_dict)
+                    state_dict = kvt.utils.fix_transformers_state_dict(
+                        state_dict
+                    )
                 else:
                     raise KeyError
 
@@ -172,10 +174,14 @@ class DefaultModelBuilderHook(ModelBuilderHookBase):
             backbone = nn.Sequential(*layers)
         elif hasattr(config, "last_linear") and config.last_linear.replace:
             backbone = replace_last_linear(
-                backbone, config.params.num_classes, **config.last_linear.params
+                backbone,
+                config.params.num_classes,
+                **config.last_linear.params,
             )
         else:
-            backbone = replace_last_linear(backbone, use_identity_as_last_layer=True)
+            backbone = replace_last_linear(
+                backbone, use_identity_as_last_layer=True
+            )
 
         args = {"backbone": backbone, "in_features": in_features}
         if filter_keys_of_args is not None:
@@ -185,7 +191,9 @@ class DefaultModelBuilderHook(ModelBuilderHookBase):
         if ("num_ftrs" in config.params.keys()) and (
             config.params.num_ftrs != in_features
         ):
-            print(f"[Replace num_ftrs] {config.params.num_ftrs} -> {in_features}")
+            print(
+                f"[Replace num_ftrs] {config.params.num_ftrs} -> {in_features}"
+            )
             config.params.num_ftrs = in_features
 
         model = build_from_config(config, MODELS, default_args=args)

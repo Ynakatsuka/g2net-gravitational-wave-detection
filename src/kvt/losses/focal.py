@@ -5,7 +5,9 @@ from torch.autograd import Variable
 
 
 class FocalLoss(nn.Module):
-    def __init__(self, gamma=0, alpha=None, size_average=True, ignore_index=-100):
+    def __init__(
+        self, gamma=0, alpha=None, size_average=True, ignore_index=-100
+    ):
         super(FocalLoss, self).__init__()
         self.gamma = gamma
         self.alpha = alpha
@@ -14,9 +16,13 @@ class FocalLoss(nn.Module):
 
     def forward(self, input, target):
         if input.dim() > 2:
-            input = input.view(input.size(0), input.size(1), -1)  # N,C,H,W => N,C,H*W
+            input = input.view(
+                input.size(0), input.size(1), -1
+            )  # N,C,H,W => N,C,H*W
             input = input.transpose(1, 2)  # N,C,H*W => N,H*W,C
-            input = input.contiguous().view(-1, input.size(2))  # N,H*W,C => N*H*W,C
+            input = input.contiguous().view(
+                -1, input.size(2)
+            )  # N,H*W,C => N*H*W,C
 
         target = target * (target != self.ignore_index).float()
         target = target.view(-1, 1)
@@ -40,7 +46,9 @@ class FocalLoss(nn.Module):
 
 
 class BinaryFocalLoss(nn.Module):
-    def __init__(self, gamma=2, alpha=None, pos_weight=None, ignore_index=-100, **_):
+    def __init__(
+        self, gamma=2, alpha=None, pos_weight=None, ignore_index=-100, **_
+    ):
         super().__init__()
         self.gamma = gamma
         self.alpha = alpha
@@ -52,12 +60,16 @@ class BinaryFocalLoss(nn.Module):
 
         input = input.view(-1, 1)
         target = target.view(-1, 1)
-        assert target.size() == input.size(), f"{target.size()} vs {input.size()}"
+        assert (
+            target.size() == input.size()
+        ), f"{target.size()} vs {input.size()}"
         if weight is not None:
             assert target.size() == weight.size()
 
         # For test
-        if isinstance(self.pos_weight, float) or isinstance(self.pos_weight, int):
+        if isinstance(self.pos_weight, float) or isinstance(
+            self.pos_weight, int
+        ):
             weight = target * (self.pos_weight - 1.0) + 1.0
         else:
             if weight is None:
@@ -83,7 +95,9 @@ class BinaryFocalLoss(nn.Module):
 
 
 class BinaryReducedFocalLoss(nn.Module):
-    def __init__(self, gamma=2, alpha=None, pos_weight=None, threshold=0.5, **_):
+    def __init__(
+        self, gamma=2, alpha=None, pos_weight=None, threshold=0.5, **_
+    ):
         super().__init__()
         self.gamma = gamma
         self.alpha = alpha
@@ -95,12 +109,16 @@ class BinaryReducedFocalLoss(nn.Module):
 
         input = input.view(-1, 1)
         target = target.view(-1, 1)
-        assert target.size() == input.size(), f"{target.size()} vs {input.size()}"
+        assert (
+            target.size() == input.size()
+        ), f"{target.size()} vs {input.size()}"
         if weight is not None:
             assert target.size() == weight.size()
 
         # For test
-        if isinstance(self.pos_weight, float) or isinstance(self.pos_weight, int):
+        if isinstance(self.pos_weight, float) or isinstance(
+            self.pos_weight, int
+        ):
             weight = target * (self.pos_weight - 1.0) + 1.0
         else:
             if weight is None:
@@ -116,7 +134,9 @@ class BinaryReducedFocalLoss(nn.Module):
         )
         invprobs = F.logsigmoid(-input * (target * 2 - 1))
         invprobs = torch.where(
-            input.gt(0), invprobs, torch.tensor(0.0).float().to(invprobs.device)
+            input.gt(0),
+            invprobs,
+            torch.tensor(0.0).float().to(invprobs.device),
         )
 
         loss = (invprobs / self.threshold * self.gamma).exp() * loss
@@ -130,7 +150,9 @@ class BinaryReducedFocalLoss(nn.Module):
 
 
 class LabelSmoothBinaryFocalLoss(nn.Module):
-    def __init__(self, lb_smooth=0.1, gamma=2, alpha=None, pos_weight=None, **_):
+    def __init__(
+        self, lb_smooth=0.1, gamma=2, alpha=None, pos_weight=None, **_
+    ):
         super().__init__()
         self.lb_smooth = lb_smooth
         self.gamma = gamma
@@ -139,16 +161,22 @@ class LabelSmoothBinaryFocalLoss(nn.Module):
 
     def forward(self, input, target, reduction=True, weight=None):
         target = target.float()
-        target = target * (1 - self.lb_smooth) + self.lb_smooth / target.size(1)
+        target = target * (1 - self.lb_smooth) + self.lb_smooth / target.size(
+            1
+        )
 
         input = input.view(-1, 1)
         target = target.view(-1, 1)
-        assert target.size() == input.size(), f"{target.size()} vs {input.size()}"
+        assert (
+            target.size() == input.size()
+        ), f"{target.size()} vs {input.size()}"
         if weight is not None:
             assert target.size() == weight.size()
 
         # For test
-        if isinstance(self.pos_weight, float) or isinstance(self.pos_weight, int):
+        if isinstance(self.pos_weight, float) or isinstance(
+            self.pos_weight, int
+        ):
             weight = target * (self.pos_weight - 1.0) + 1.0
         else:
             if weight is None:
@@ -185,12 +213,16 @@ class BinaryDualFocalLoss(nn.Module):
 
         input = input.view(-1, 1)
         target = target.view(-1, 1)
-        assert target.size() == input.size(), f"{target.size()} vs {input.size()}"
+        assert (
+            target.size() == input.size()
+        ), f"{target.size()} vs {input.size()}"
         if weight is not None:
             assert target.size() == weight.size()
 
         # For test
-        if isinstance(self.pos_weight, float) or isinstance(self.pos_weight, int):
+        if isinstance(self.pos_weight, float) or isinstance(
+            self.pos_weight, int
+        ):
             weight = target * (self.pos_weight - 1.0) + 1.0
         else:
             if weight is None:

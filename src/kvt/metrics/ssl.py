@@ -8,7 +8,9 @@ from sklearn.preprocessing import normalize
 
 
 class BaseSSLScorer:
-    def __init__(self, test_size=0.2, random_state=42, apply_normalize=True, **kwargs):
+    def __init__(
+        self, test_size=0.2, random_state=42, apply_normalize=True, **kwargs
+    ):
         self.test_size = test_size
         self.random_state = random_state
         self.model_kwargs = kwargs
@@ -42,7 +44,12 @@ class BaseSSLScorer:
 
 class BaseSSLCVScorer:
     def __init__(
-        self, n_splits=5, random_state=42, apply_normalize=True, n_jobs=5, **kwargs
+        self,
+        n_splits=5,
+        random_state=42,
+        apply_normalize=True,
+        n_jobs=5,
+        **kwargs,
     ):
         self.n_splits = n_splits
         self.random_state = random_state

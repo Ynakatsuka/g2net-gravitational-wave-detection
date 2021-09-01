@@ -69,6 +69,8 @@ class VATLoss(nn.Module):
             r_adv = d * self.eps
             pred_hat = model(x + r_adv)
             logp_hat = self.log_link_func(pred_hat, dim=1)
-            lds = F.kl_div(logp_hat, pred, reduction="batchmean", log_target=False)
+            lds = F.kl_div(
+                logp_hat, pred, reduction="batchmean", log_target=False
+            )
 
         return lds * self.alpha

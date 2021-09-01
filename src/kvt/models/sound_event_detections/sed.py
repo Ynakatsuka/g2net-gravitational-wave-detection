@@ -178,7 +178,9 @@ class SED(nn.Module):
             self.spectral_centroid_bn = nn.BatchNorm1d(1)
 
         if self.apply_pcen:
-            self.pcen_transform = PCENTransform(trainable=~freeze_pcen_parameters,)
+            self.pcen_transform = PCENTransform(
+                trainable=~freeze_pcen_parameters,
+            )
 
         self.bn0 = nn.BatchNorm2d(n_mels)
         self.backbone = backbone
@@ -187,7 +189,9 @@ class SED(nn.Module):
             self.big_dropout = nn.Dropout(p=multisample_dropout)
 
         self.fc1 = nn.Linear(in_features, in_features, bias=True)
-        self.att_block = AttBlockV2(in_features, num_classes, activation="sigmoid")
+        self.att_block = AttBlockV2(
+            in_features, num_classes, activation="sigmoid"
+        )
 
     def forward(self, input, mixup_lambda=None, mixup_index=None):
         # (batch_size, 1, time_steps, freq_bins)
@@ -226,7 +230,9 @@ class SED(nn.Module):
             idx = torch.randperm(x.shape[3])
             x = x[:, :, :, idx]
 
-        if (self.training or self.apply_tta) and (self.spec_augmenter is not None):
+        if (self.training or self.apply_tta) and (
+            self.spec_augmenter is not None
+        ):
             x = self.spec_augmenter(x)
 
         # additional features
@@ -428,7 +434,9 @@ class ImageSED(nn.Module):
             self.spectral_centroid_bn = nn.BatchNorm1d(1)
 
         if self.apply_pcen:
-            self.pcen_transform = PCENTransform(trainable=~freeze_pcen_parameters,)
+            self.pcen_transform = PCENTransform(
+                trainable=~freeze_pcen_parameters,
+            )
 
         # layers = list(backbone.children())[:-2]
         # self.backbone = nn.Sequential(*layers)
@@ -491,7 +499,9 @@ class ImageSED(nn.Module):
             idx = torch.randperm(x.shape[3])
             x = x[:, :, :, idx]
 
-        if (self.training or self.apply_tta) and (self.spec_augmenter is not None):
+        if (self.training or self.apply_tta) and (
+            self.spec_augmenter is not None
+        ):
             x = self.spec_augmenter(x)
 
         # additional features
@@ -651,7 +661,9 @@ class ConformerSED(nn.Module):
             idx = torch.randperm(x.shape[3])
             x = x[:, :, :, idx]
 
-        if (self.training or self.apply_tta) and (self.spec_augmenter is not None):
+        if (self.training or self.apply_tta) and (
+            self.spec_augmenter is not None
+        ):
             x = self.spec_augmenter(x)
 
         # Mixup on spectrogram

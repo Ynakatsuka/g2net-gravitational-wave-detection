@@ -65,11 +65,15 @@ def get_pooler(pooler_name, hidden_size):
     return pooler
 
 
-def transformers_for_sequence_classification(model_name, num_classes, **kwargs):
+def transformers_for_sequence_classification(
+    model_name, num_classes, **kwargs
+):
     config = AutoConfig.from_pretrained(model_name, num_labels=num_classes)
     print("-" * 100)
     print(f"Model Config: {config}")
-    return AutoModelForSequenceClassification.from_pretrained(model_name, config=config)
+    return AutoModelForSequenceClassification.from_pretrained(
+        model_name, config=config
+    )
 
 
 def transformers_for_masked_language_model(model_name, **kwargs):
@@ -132,7 +136,10 @@ class CustomTransformersForSequenceClassification(nn.Module):
         if use_multisample_dropout:
             last_layers.append(
                 MultiSampleDropout(
-                    hidden_size, num_classes, multi_sample_dropout_p, n_multi_samples
+                    hidden_size,
+                    num_classes,
+                    multi_sample_dropout_p,
+                    n_multi_samples,
                 )
             )
         else:
@@ -150,11 +157,15 @@ class CustomTransformersForSequenceClassification(nn.Module):
 
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
-            module.weight.data.normal_(mean=0.0, std=self.config.initializer_range)
+            module.weight.data.normal_(
+                mean=0.0, std=self.config.initializer_range
+            )
             if module.bias is not None:
                 module.bias.data.zero_()
         elif isinstance(module, nn.Embedding):
-            module.weight.data.normal_(mean=0.0, std=self.config.initializer_range)
+            module.weight.data.normal_(
+                mean=0.0, std=self.config.initializer_range
+            )
             if module.padding_idx is not None:
                 module.weight.data[module.padding_idx].zero_()
         elif isinstance(module, nn.LayerNorm):
@@ -218,7 +229,10 @@ class CustomTransformersForSequenceClassification(nn.Module):
 
             if isinstance(self.bert_pooling, nn.ModuleList):
                 pooler_output = torch.cat(
-                    [pooler(hidden_states).squeeze() for pooler in self.bert_pooling],
+                    [
+                        pooler(hidden_states).squeeze()
+                        for pooler in self.bert_pooling
+                    ],
                     dim=-1,
                 )  # -> [bs, hidden_states*len(pooler_name)]
             else:

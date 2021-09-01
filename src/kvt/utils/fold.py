@@ -18,7 +18,9 @@ class MultilabelStratifiedGroupKFold(_BaseKFold):
     """
 
     def __init__(self, n_splits=5, random_state=None, shuffle=False):
-        super().__init__(n_splits=n_splits, random_state=random_state, shuffle=shuffle)
+        super().__init__(
+            n_splits=n_splits, random_state=random_state, shuffle=shuffle
+        )
 
     def _iter_test_indices(self, X=None, y=None, groups=None):
         np.random.seed(self.random_state)
@@ -50,9 +52,13 @@ class MultilabelStratifiedGroupKFold(_BaseKFold):
         cnts_by_fold = np.zeros((self.n_splits, n_class), int)
 
         groups_by_fold = [[] for fid in range(self.n_splits)]
-        group_and_cnts = list(enumerate(cnts_by_group))  # pair of aid and cnt by group
+        group_and_cnts = list(
+            enumerate(cnts_by_group)
+        )  # pair of aid and cnt by group
         np.random.shuffle(group_and_cnts)
-        for aid, cnt_by_g in sorted(group_and_cnts, key=lambda x: -np.std(x[1])):
+        for aid, cnt_by_g in sorted(
+            group_and_cnts, key=lambda x: -np.std(x[1])
+        ):
             best_fold = None
             min_eval = None
             for fid in range(self.n_splits):
@@ -153,7 +159,9 @@ class StratifiedGroupKFold(_BaseKFold):
     """
 
     def __init__(self, n_splits=5, shuffle=False, random_state=None):
-        super().__init__(n_splits=n_splits, shuffle=shuffle, random_state=random_state)
+        super().__init__(
+            n_splits=n_splits, shuffle=shuffle, random_state=random_state
+        )
 
     def _iter_test_indices(self, X, y, groups):
         # Implementation is based on this kaggle kernel:
@@ -245,7 +253,9 @@ class StratifiedGroupKFold(_BaseKFold):
         for i in range(self.n_splits):
             y_counts_per_fold[i] += group_y_counts
             # Summarise the distribution over classes in each proposed fold
-            std_per_class = np.std(y_counts_per_fold / y_cnt.reshape(1, -1), axis=0)
+            std_per_class = np.std(
+                y_counts_per_fold / y_cnt.reshape(1, -1), axis=0
+            )
             y_counts_per_fold[i] -= group_y_counts
             fold_eval = np.mean(std_per_class)
             samples_in_fold = np.sum(y_counts_per_fold[i])

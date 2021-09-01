@@ -11,7 +11,9 @@ from omegaconf import DictConfig
 
 class TsFreshFeatures(BaseG2NetFeatureEngineeringDataset):
     def _engineer_features(self, signals):
-        df = pd.DataFrame(signals.T, columns=["channel_0", "channel_1", "channel_2"])
+        df = pd.DataFrame(
+            signals.T, columns=["channel_0", "channel_1", "channel_2"]
+        )
         df["id"] = 0
         extracted_features = tsfresh.extract_features(
             df, column_id="id", n_jobs=0, disable_progressbar=True

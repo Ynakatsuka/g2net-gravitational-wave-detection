@@ -20,7 +20,8 @@ def dice_loss(input, target):
     intersection = (iflat * tflat).sum(dim=1)
 
     loss = 1 - (
-        (2.0 * intersection + smooth) / (iflat.sum(dim=1) + tflat.sum(dim=1) + smooth)
+        (2.0 * intersection + smooth)
+        / (iflat.sum(dim=1) + tflat.sum(dim=1) + smooth)
     )
     loss = loss.mean()
     return loss

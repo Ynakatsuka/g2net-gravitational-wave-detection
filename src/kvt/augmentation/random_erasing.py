@@ -4,7 +4,9 @@ from albumentations.core.transforms_interface import ImageOnlyTransform
 
 
 class RandomErasing(ImageOnlyTransform):
-    def __init__(self, always_apply=False, p=0.5, sl=0.02, sh=0.4, r1=0.3, r2=3.3):
+    def __init__(
+        self, always_apply=False, p=0.5, sl=0.02, sh=0.4, r1=0.3, r2=3.3
+    ):
         super().__init__(always_apply, p)
         self.sl = sl
         self.sh = sh

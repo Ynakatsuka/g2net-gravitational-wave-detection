@@ -65,7 +65,9 @@ def build_dataloaders(config, drop_last=None, shuffle=None):
     for dataset_config in dataset_configs:
         dataset_config = edict(dataset_config)
         for split_config in dataset_config.splits:
-            cfg = edict({"name": dataset_config.name, "params": dataset_config.params})
+            cfg = edict(
+                {"name": dataset_config.name, "params": dataset_config.params}
+            )
             cfg.params.update(split_config)
 
             if config.print_config:
@@ -89,7 +91,9 @@ def build_dataloaders(config, drop_last=None, shuffle=None):
                     transform_cfg[hw] = getattr(config.augmentation, hw)
 
             transform = build_from_config(
-                config.dataset.transform, TRANSFORMS, default_args=transform_cfg
+                config.dataset.transform,
+                TRANSFORMS,
+                default_args=transform_cfg,
             )
 
             # build dataset
@@ -155,7 +159,8 @@ def build_optimizer(config, model=None, **kwargs):
             cfg.params.base, OPTIMIZERS, default_args=kwargs
         )
         optimizer = getattr(optim, cfg.name)(
-            base_optimizer, **{k: v for k, v in cfg.params.items() if k != "base"},
+            base_optimizer,
+            **{k: v for k, v in cfg.params.items() if k != "base"},
         )
     elif cfg.name == "SAM":
         # optimizer: class
@@ -188,7 +193,9 @@ def build_loss(config, **kwargs):
 
 def build_lightning_module(config, **kwargs):
     return build_from_config(
-        config.lightning_module.lightning_module, LIGHTNING_MODULES, default_args=kwargs
+        config.lightning_module.lightning_module,
+        LIGHTNING_MODULES,
+        default_args=kwargs,
     )
 
 
@@ -201,7 +208,9 @@ def build_callbacks(config):
             cfgs = [cfgs]
         for cfg in cfgs:  # list of dict
             for key in cfg:
-                callback = hydra.utils.instantiate(OmegaConf.create(dict(cfg[key])))
+                callback = hydra.utils.instantiate(
+                    OmegaConf.create(dict(cfg[key]))
+                )
                 callbacks.append(callback)
     return callbacks
 
@@ -252,7 +261,9 @@ def build_hooks(config):
             visualization_hook_configs.append(hooks.visualizations)
 
     hooks_dict = {}
-    hooks_dict["post_forward_fn"] = build_from_config(post_forward_hook_config, HOOKS)
+    hooks_dict["post_forward_fn"] = build_from_config(
+        post_forward_hook_config, HOOKS
+    )
     hooks_dict["visualization"] = [
         build_from_config(cfg, HOOKS) for cfg in visualization_hook_configs
     ]
@@ -292,16 +303,23 @@ def build_batch_transform(config):
 
             # TODO: fix here
             try:
-                trans = [getattr(T, trans.name)(**trans.params) for trans in cfg]
+                trans = [
+                    getattr(T, trans.name)(**trans.params) for trans in cfg
+                ]
             except:
                 try:
                     import kornia.augmentation as K
 
-                    trans = [getattr(K, trans.name)(**trans.params) for trans in cfg]
+                    trans = [
+                        getattr(K, trans.name)(**trans.params) for trans in cfg
+                    ]
                 except:
                     import torch_audiomentations as TA
 
-                    trans = [getattr(TA, trans.name)(**trans.params) for trans in cfg]
+                    trans = [
+                        getattr(TA, trans.name)(**trans.params)
+                        for trans in cfg
+                    ]
             transforms[split] = nn.Sequential(*trans)
 
     return transforms
@@ -315,7 +333,9 @@ def build_tta_wrapper(config):
     ):
         # build transforms
         cfg = config.augmentation.tta_transform
-        transforms = hydra.utils.instantiate(OmegaConf.create(dict(cfg.transforms)))
+        transforms = hydra.utils.instantiate(
+            OmegaConf.create(dict(cfg.transforms))
+        )
 
         # build wrapper
         cfg.transforms = None
@@ -333,7 +353,9 @@ def build_plugins(config, is_ddp=True):
     if is_ddp:
         if hasattr(config.trainer, "find_unused_parameters"):
             plugins.append(
-                DDPPlugin(find_unused_parameters=config.trainer.find_unused_parameters),
+                DDPPlugin(
+                    find_unused_parameters=config.trainer.find_unused_parameters
+                ),
             )
         else:
             plugins.append(DDPPlugin(find_unused_parameters=False))
